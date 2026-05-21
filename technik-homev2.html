@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technik-Home – Réparation électroménager à domicile</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --blue: #1a73c8;
+    --blue-light: #3a9bdc;
+    --orange: #f5a623;
+    --white: #f8f9fb;
+    --gray: #8a97a8;
+    --card-bg: #162233;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 4vw;
+    background: rgba(13,27,42,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.7rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+  .logo span { color: var(--blue-light); }
+
+  nav a {
+    color: var(--gray);
+    text-decoration: none;
+    margin-left: 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color .2s;
+  }
+  nav a:hover { color: var(--white); }
+
+  .cta-nav {
+    background: var(--blue);
+    color: var(--white) !important;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    transition: background .2s !important;
+  }
+  .cta-nav:hover { background: var(--blue-light) !important; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4vw 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 70% 40%, rgba(26,115,200,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(245,166,35,0.08) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(26,115,200,0.15);
+    border: 1px solid rgba(26,115,200,0.3);
+    border-radius: 100px;
+    padding: 0.35rem 1rem;
+    font-size: 0.82rem;
+    color: var(--blue-light);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-badge::before { content: '●'; font-size: 0.5rem; color: #4cde80; }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  h1 em { color: var(--blue-light); font-style: normal; }
+
+  .hero-sub {
+    color: var(--gray);
+    font-size: 1.05rem;
+    max-width: 480px;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background .2s, transform .15s;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-primary:hover { background: var(--blue-light); transform: translateY(-2px); }
+
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: border-color .2s, transform .15s;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-secondary:hover { border-color: var(--blue-light); transform: translateY(-2px); }
+
+  /* Hero visual side */
+  .hero-visual {
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .device-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 380px;
+  }
+
+  .device-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--gray);
+    
+  }
+  .device-card:hover { border-color: var(--blue-light); } .device-card { cursor: pointer; text-decoration: none; color: var(--gray); }
+  .device-card .icon { font-size: 1.8rem; }
+  .device-card.featured {
+    grid-column: span 3;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(26,115,200,0.2), rgba(26,115,200,0.05));
+    border-color: rgba(26,115,200,0.4);
+    font-size: 0.85rem;
+    color: var(--blue-light);
+    font-weight: 600;
+  }
+
+  /* ─── CHIPS ─── */
+  .chips {
+    display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+    padding: 1.5rem 4vw;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .chip {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    color: var(--gray);
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-light); }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 5rem 4vw; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--blue-light);
+    margin-bottom: 0.8rem;
+  }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .section-desc { color: var(--gray); max-width: 520px; margin-bottom: 3rem; }
+
+  /* ─── SERVICES ─── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .service-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: var(--blue);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .3s;
+  }
+  .service-card:hover { border-color: rgba(26,115,200,0.4); transform: translateY(-4px); }
+  .service-card:hover::after { transform: scaleX(1); }
+
+  .service-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+  .service-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.35rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .service-desc { color: var(--gray); font-size: 0.88rem; }
+
+  /* ─── TARIFS ─── */
+  #tarifs { background: rgba(26,115,200,0.04); }
+
+  .tarifs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tarif-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex; flex-direction: column;
+    transition: transform .3s, border-color .3s;
+  }
+  .tarif-card:hover { transform: translateY(-6px); border-color: rgba(26,115,200,0.4); }
+  .tarif-card.featured {
+    border-color: var(--blue);
+    background: linear-gradient(160deg, rgba(26,115,200,0.15), var(--card-bg));
+  }
+
+  .tarif-badge {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--blue-light);
+    background: rgba(26,115,200,0.15);
+    border-radius: 100px; padding: 0.25rem 0.7rem;
+    align-self: flex-start; margin-bottom: 1rem;
+  }
+  .tarif-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .tarif-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem; letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+  }
+  .tarif-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; color: var(--white);
+    line-height: 1; margin-bottom: 0.3rem;
+  }
+  .tarif-price span { font-size: 1.5rem; color: var(--blue-light); }
+  .tarif-note { color: var(--gray); font-size: 0.78rem; margin-bottom: 1.5rem; }
+
+  .tarif-features { list-style: none; flex: 1; }
+  .tarif-features li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 0.87rem;
+    display: flex; align-items: flex-start; gap: 0.6rem;
+  }
+  .tarif-features li:last-child { border-bottom: none; }
+  .tarif-features li::before { content: '✓'; color: var(--blue-light); font-weight: 700; flex-shrink: 0; }
+
+  .tarif-extra {
+    margin-top: 2.5rem;
+    background: rgba(245,166,35,0.08);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+  }
+  .tarif-extra-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem; color: var(--orange);
+    margin-bottom: 0.5rem;
+  }
+  .tarif-extra p { color: var(--gray); font-size: 0.88rem; }
+
+  /* ─── POURQUOI ─── */
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+  .why-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+    text-align: center;
+  }
+  .why-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .why-title { font-weight: 600; margin-bottom: 0.4rem; }
+  .why-text { color: var(--gray); font-size: 0.85rem; }
+
+  /* ─── CONTACT ─── */
+  #contact { background: rgba(26,115,200,0.04); }
+
+  .contact-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact-info h2 { margin-bottom: 1rem; }
+  .contact-info p { color: var(--gray); margin-bottom: 2rem; }
+
+  .info-block {
+    display: flex; align-items: flex-start; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .info-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(26,115,200,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .info-label { font-size: 0.78rem; color: var(--gray); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .info-value { font-weight: 600; font-size: 1.05rem; }
+  .info-value a { color: var(--white); text-decoration: none; transition: color .2s; }
+  .info-value a:hover { color: var(--blue-light); }
+
+  .zone-badge {
+    display: inline-block;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.25);
+    border-radius: 10px;
+    padding: 1rem 1.4rem;
+    margin-top: 0.5rem;
+  }
+  .zone-badge strong { color: var(--orange); font-size: 1.1rem; }
+  .zone-badge span { color: var(--gray); font-size: 0.82rem; display: block; margin-top: 0.2rem; }
+
+  /* Form */
+  form {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color .2s;
+    appearance: none;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--blue-light);
+  }
+  .field select option { background: var(--navy); }
+  .field textarea { resize: vertical; min-height: 100px; }
+
+  .form-submit {
+    width: 100%;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    margin-top: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  }
+  .form-submit:hover { background: var(--blue-light); transform: translateY(-2px); }
+
+  #form-success {
+    display: none;
+    background: rgba(76,222,128,0.1);
+    border: 1px solid rgba(76,222,128,0.3);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    color: #4cde80;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 2rem 4vw;
+    border-top: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 0.82rem;
+  }
+  footer strong { color: var(--white); }
+
+  /* ─── ANIMS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .device-grid { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
+    .device-card.featured { grid-column: span 2; }
+    .tarifs-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .chips { flex-direction: column; align-items: center; }
+    .hero-grid { grid-template-columns: 1fr; text-align: center; }
+    .hero-sub { margin: 0 auto 2rem; }
+    .hero-btns { justify-content: center; }
+    .hero-badge { margin: 0 auto 1.5rem; display: inline-flex; }
+    .contact-wrapper { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 480px) {
+    .device-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .device-card { padding: 0.8rem; font-size: 0.7rem; }
+    .device-card .icon { font-size: 1.4rem; }
+    .hero-title { font-size: clamp(1.6rem, 8vw, 2.5rem); }
+    header { padding: 0 1rem; }
+    section { padding: 3rem 1rem; }
+    .tarif-card { padding: 1.5rem; }
+    .contact-wrapper { gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">TECHNIK<span>-HOME</span></div>
+  <nav>
+    <a href="#services">Services</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="#contact" class="cta-nav">Nous contacter</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">Intervention sous 48h • Secteurs 59 / 62</div>
+      <h1>Réparation<br><em>Électro-<br>ménager</em><br>à domicile</h1>
+      <p class="hero-sub">Diagnostic transparent, main-d'œuvre incluse, toutes marques. On se déplace chez vous dans le Nord et le Pas-de-Calais.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">📬 Nous contacter</a>
+        <a href="#tarifs" class="btn-secondary">Voir les tarifs →</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="device-grid">
+        <a href="#tarifs" class="device-card"><div class="icon">🫙</div>Lave-linge</a>
+        <a href="#tarifs" class="device-card"><div class="icon">🍽️</div>Lave-vaisselle</a>
+        <a href="#tarifs" class="device-card"><div class="icon">🌬️</div>Sèche-linge</a>
+        <a href="#tarifs" class="device-card"><div class="icon">🍕</div>Four &amp; plaques</a>
+        <a href="#tarifs" class="device-card"><div class="icon">🧊</div>Frigo / Congélo</a>
+        <a href="#tarifs" class="device-card"><div class="icon">📺</div>TV &amp; Audio</a>
+        <a href="#tarifs" class="device-card featured"><span>🛠️</span> Toutes marques réparées</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHIPS -->
+<div class="chips">
+  <div class="chip"><span class="dot"></span>Intervention rapide 24h/48h</div>
+  <div class="chip"><span class="dot"></span>Devis avant réparation</div>
+  <div class="chip"><span class="dot"></span>Assurance professionnelle</div>
+  <div class="chip"><span class="dot"></span>Garantie main-d'œuvre 15 jours</div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label">Ce qu'on répare</div>
+    <h2>Nos Services</h2>
+    <p class="section-desc">Du petit électroménager au gros appareil, on intervient sur tout. Diagnostic complet inclus dans chaque forfait.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🫙</div>
+        <div class="service-name">Lave-linge & Sèche-linge</div>
+        <p class="service-desc">Pannes mécaniques, électroniques, problèmes de programme ou de vidange.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🍽️</div>
+        <div class="service-name">Lave-vaisselle</div>
+        <p class="service-desc">Fuites, problèmes de pompe, bras de lavage, résistance, électronique.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🍕</div>
+        <div class="service-name">Four & Plaques de cuisson</div>
+        <p class="service-desc">Résistances, thermostats, ventilateurs, pannes d'induction ou à gaz.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🧊</div>
+        <div class="service-name">Frigo & Congélateur</div>
+        <p class="service-desc">Problèmes de froid, compresseur, thermostat, ventilateur. <em style="color:var(--gray);font-size:0.8em">(Sans intervention sur circuit frigorigène)</em></p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📺</div>
+        <div class="service-name">TV & Audiovisuel</div>
+        <p class="service-desc">Pannes d'image, de son, de carte électronique ou d'alimentation.</p>
+      </div>
+      <div class="service-card" style="border-color:rgba(26,115,200,0.3);">
+        <div class="service-icon">🔧</div>
+        <div class="service-name">Toutes marques</div>
+        <p class="service-desc">Bosch, Whirlpool, Samsung, LG, Siemens, Beko, Electrolux, Miele et bien d'autres.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARIFS -->
+<section id="tarifs">
+  <div class="section-inner">
+    <div class="section-label">Grille 2026</div>
+    <h2>Tarifs Transparents</h2>
+    <p class="section-desc">Forfaits tout compris : déplacement (59/62), diagnostic et main-d'œuvre. Hors pièces détachées.</p>
+
+    <div class="tarifs-grid">
+      <!-- Cuisson / Audiovisuel -->
+      <div class="tarif-card">
+        <div class="tarif-icon">🍕</div>
+        <div class="tarif-name">Forfait Cuisson / Audiovisuel</div>
+        <div class="tarif-price">60<span>€ TTC</span></div>
+        <p class="tarif-note">Hors coût des pièces détachées éventuelles</p>
+        <ul class="tarif-features">
+          <li>Déplacement à domicile (59/62)</li>
+          <li>Diagnostic complet</li>
+          <li>Main-d'œuvre incluse* <em style="font-size:0.78em;color:#6a7a8a">(*1ère heure)</em></li>
+          <li>Audiovisuel dans la limite de l'espace</li>
+        </ul>
+      </div>
+      <!-- Lavage / Séchage -->
+      <div class="tarif-card featured">
+        <div class="tarif-icon">🫙</div>
+        <div class="tarif-name">Forfait Lavage / Séchage</div>
+        <div class="tarif-price">65<span>€ TTC</span></div>
+        <p class="tarif-note">Hors coût des pièces détachées éventuelles</p>
+        <ul class="tarif-features">
+          <li>Déplacement à domicile (59/62)</li>
+          <li>Diagnostic complet</li>
+          <li>Main-d'œuvre incluse* <em style="font-size:0.78em;color:#6a7a8a">(*1ère heure)</em></li>
+          <li>Vérification et conseils d'utilisation</li>
+        </ul>
+      </div>
+      <!-- Froid -->
+      <div class="tarif-card">
+        <div class="tarif-icon">🧊</div>
+        <div class="tarif-name">Forfait Froid</div>
+        <div class="tarif-price">70<span>€ TTC</span></div>
+        <p class="tarif-note">Hors coût des pièces détachées éventuelles</p>
+        <ul class="tarif-features">
+          <li>Déplacement à domicile (59/62)</li>
+          <li>Diagnostic complet</li>
+          <li>Main-d'œuvre incluse* <em style="font-size:0.78em;color:#6a7a8a">(*1ère heure)</em></li>
+          <li>Pas d'intervention sur circuit frigorigène à domicile</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tarif-extra">
+      <div class="tarif-extra-title">⚙️ Second déplacement – Pose de pièce</div>
+      <p>Si une pièce doit être commandée et posée lors d'une seconde intervention : <strong style="color:var(--white)">25€ TTC + prix de la pièce.</strong></p>
+    </div>
+
+    <div style="margin-top:1.5rem; background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:1.5rem 2rem; display:flex; gap:2rem; flex-wrap:wrap;">
+      <div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.3rem;">Garantie pièce</div>
+        <div style="font-weight:600;">Selon constructeur</div>
+      </div>
+      <div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.3rem;">Garantie main-d'œuvre</div>
+        <div style="font-weight:600;">15 jours</div>
+      </div>
+      <div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.3rem;">Devis</div>
+        <div style="font-weight:600;">Avant toute réparation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POURQUOI NOUS -->
+<section id="pourquoi">
+  <div class="section-inner">
+    <div class="section-label">Nos engagements</div>
+    <h2>Pourquoi Technik-Home ?</h2>
+    <p class="section-desc">Expertise, transparence et éco-responsabilité : on répare plutôt que remplacer.</p>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-icon">⚡</div>
+        <div class="why-title">Intervention rapide</div>
+        <p class="why-text">Sous 24 à 48h après votre contact.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">💬</div>
+        <div class="why-title">Devis transparent</div>
+        <p class="why-text">On vous explique tout avant d'intervenir. Pas de surprise.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">🛡️</div>
+        <div class="why-title">Assuré</div>
+        <p class="why-text">Assurance professionnelle incluse pour votre sérénité.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">🌱</div>
+        <div class="why-title">Éco-responsable</div>
+        <p class="why-text">Réparer c'est moins cher et meilleur pour la planète.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">🏷️</div>
+        <div class="why-title">Toutes marques</div>
+        <p class="why-text">Quelle que soit la marque, on a les compétences.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="contact-wrapper">
+      <div class="contact-info">
+        <div class="section-label">Parlons-en</div>
+        <h2>Contactez-Nous</h2>
+        <p>Une panne ? Décrivez votre problème et nous reviendrons vers vous rapidement pour organiser l'intervention.</p>
+
+        <div class="info-block">
+          <div class="info-icon">📞</div>
+          <div>
+            <div class="info-label">Téléphone</div>
+            <div class="info-value"><a href="tel:0759705497">07 59 70 54 97</a></div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-icon">✉️</div>
+          <div>
+            <div class="info-label">Email</div>
+            <div class="info-value"><a href="mailto:technikhome62@gmail.com">technikhome62@gmail.com</a></div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-icon">📍</div>
+          <div>
+            <div class="info-label">Zone d'intervention</div>
+            <div class="zone-badge">
+              <strong>Secteurs 59 & 62</strong>
+              <span>Nord • Pas-de-Calais</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-icon">⏱️</div>
+          <div>
+            <div class="info-label">Délai d'intervention</div>
+            <div class="info-value">Sous 48h</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="field">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
+          </div>
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="tel">Téléphone</label>
+            <input type="tel" id="tel" name="tel" placeholder="06 / 07..." required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="votre@email.fr">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="appareil">Type d'appareil</label>
+          <select id="appareil" name="appareil" required>
+            <option value="" disabled selected>Choisissez…</option>
+            <option>Lave-linge</option>
+            <option>Sèche-linge</option>
+            <option>Lave-vaisselle</option>
+            <option>Four</option>
+            <option>Plaques de cuisson</option>
+            <option>Réfrigérateur / Congélateur</option>
+            <option>TV / Audiovisuel</option>
+            <option>Autre</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="message">Description de la panne</label>
+          <textarea id="message" name="message" placeholder="Décrivez le problème, la marque, le modèle si possible…" required></textarea>
+        </div>
+
+        <button type="submit" class="form-submit">
+          📬 Envoyer le message
+        </button>
+
+        <div id="form-success">
+          ✅ Message envoyé ! Nous vous recontacterons sous 48h.
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>TECHNIK-HOME</strong> — Réparation électroménager à domicile</p>
+</footer>
+
+<script>
+async function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('contactForm');
+  const success = document.getElementById('form-success');
+  const btn = form.querySelector('.form-submit');
+
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+
+  const prenom = form.prenom.value;
+  const nom = form.nom.value;
+  const tel = form.tel.value;
+  const email = form.email.value;
+  const appareil = form.appareil.value;
+  const message = form.message.value;
+
+  const data = {
+    access_key: "dd2ba324-6acb-4d08-892d-a405ce0bf7c8",
+    subject: `Demande de réparation - ${appareil}`,
+    from_name: `${prenom} ${nom}`,
+    email: email || 'Non renseigné',
+    message: `Nom : ${prenom} ${nom}\nTéléphone : ${tel}\nEmail : ${email || 'Non renseigné'}\nAppareil : ${appareil}\n\nDescription :\n${message}`
+  };
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (json.success) {
+      success.style.display = 'block';
+      form.reset();
+      setTimeout(() => success.style.display = 'none', 6000);
+    } else {
+      alert('Une erreur est survenue, veuillez réessayer.');
+    }
+  } catch(err) {
+    alert('Erreur réseau, veuillez réessayer.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Envoyer ma demande →';
+}
+
+// Subtle scroll fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.service-card, .tarif-card, .why-item, .info-block').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
+
+<!-- FOAM EFFECT -->
+<canvas id="foam-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999;"></canvas>
+<script>
+const fc = document.getElementById('foam-canvas');
+const fctx = fc.getContext('2d');
+let fW, fH, bubbles = [], pops = [], lastX = 0, lastY = 0, dist = 0;
+function fResize() { fW = fc.width = window.innerWidth; fH = fc.height = window.innerHeight; }
+fResize(); window.addEventListener('resize', fResize);
+function makeSmall(x, y) {
+  return { x: x+(Math.random()-.5)*18, y: y+(Math.random()-.5)*10, r: 4+Math.random()*9,
+    vx:(Math.random()-.5)*.5, vy:-(0.5+Math.random()*1.0), life:1.0,
+    decay:0.010+Math.random()*0.010, phase:Math.random()*Math.PI*2, big:false };
+}
+function makeBig(x,y) {
+  return { x, y, r:0, targetR:30+Math.random()*14, growing:true, life:1.0,
+    phase:Math.random()*Math.PI*2, vy:-(0.18+Math.random()*0.15),
+    vx:(Math.random()-.5)*.3, big:true, popped:false };
+}
+function spawnPop(x,y) {
+  for(let i=0;i<10;i++){
+    const angle=(Math.PI*2/10)*i+(Math.random()-.5)*.4, speed=0.8+Math.random()*1.4;
+    pops.push({ x,y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed*.4,
+      r:2+Math.random()*5, life:1.0, decay:0.025+Math.random()*.02, phase:Math.random()*Math.PI*2 });
+  }
+}
+document.addEventListener('mousemove', e => {
+  dist += Math.hypot(e.clientX-lastX, e.clientY-lastY);
+  lastX=e.clientX; lastY=e.clientY;
+  if(dist>80){ dist=0; for(let i=0;i<2+Math.floor(Math.random()*3);i++) bubbles.push(makeSmall(e.clientX,e.clientY)); }
+});
+document.addEventListener('click', e => { bubbles.push(makeBig(e.clientX,e.clientY)); });
+function drawBubble(ctx,b,alpha) {
+  ctx.save(); ctx.globalAlpha=alpha;
+  const g=ctx.createRadialGradient(b.x-b.r*.3,b.y-b.r*.35,b.r*.04,b.x,b.y,b.r);
+  g.addColorStop(0,'rgba(255,255,255,0.95)'); g.addColorStop(.4,'rgba(186,230,253,0.6)'); g.addColorStop(1,'rgba(96,165,250,0.02)');
+  ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle=`rgba(147,197,253,${alpha*.5})`; ctx.lineWidth=b.big?1.2:.7; ctx.stroke(); ctx.restore();
+}
+(function loop(){
+  fctx.clearRect(0,0,fW,fH);
+  bubbles=bubbles.filter(b=>{
+    if(b.big){ if(b.popped)return false; b.x+=b.vx; b.y+=b.vy;
+      if(b.growing){ b.r+=1.4; if(b.r>=b.targetR){ spawnPop(b.x,b.y); b.popped=true; return false; } }
+      drawBubble(fctx,b,.7); return true;
+    } else { b.phase+=.06; b.x+=b.vx+Math.sin(b.phase)*.3; b.y+=b.vy; b.life-=b.decay;
+      if(b.life>0) drawBubble(fctx,b,b.life*.65); return b.life>0; }
+  });
+  pops=pops.filter(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.04; p.life-=p.decay; if(p.life<=0)return false;
+    fctx.save(); fctx.globalAlpha=p.life*.6;
+    const g=fctx.createRadialGradient(p.x-p.r*.3,p.y-p.r*.3,p.r*.04,p.x,p.y,p.r);
+    g.addColorStop(0,'rgba(255,255,255,0.95)'); g.addColorStop(.5,'rgba(186,230,253,0.5)'); g.addColorStop(1,'rgba(96,165,250,0.02)');
+    fctx.beginPath(); fctx.arc(p.x,p.y,p.r,0,Math.PI*2); fctx.fillStyle=g; fctx.fill();
+    fctx.strokeStyle=`rgba(147,197,253,${p.life*.4})`; fctx.lineWidth=.6; fctx.stroke(); fctx.restore(); return true;
+  });
+  requestAnimationFrame(loop);
+})();
+</script>
