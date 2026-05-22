@@ -43,11 +43,11 @@
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.7rem;
+    font-size: 2.1rem;
     letter-spacing: 0.05em;
     color: var(--white);
   }
-  .logo span { color: var(--blue-light); }
+  .logo span { color: var(--orange); }
 
   nav a {
     color: var(--gray);
@@ -199,7 +199,7 @@
 
   /* ─── CHIPS ─── */
   .chips {
-    display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+    display: flex; gap: 0.6rem; flex-wrap: nowrap; justify-content: center; overflow-x: auto;
     padding: 1.5rem 4vw;
     max-width: 1000px;
     margin: 0 auto;
@@ -608,7 +608,7 @@
   <div class="section-inner">
     <div class="section-label">Grille 2026</div>
     <h2>Tarifs Transparents</h2>
-    <p class="section-desc">Forfaits tout compris : déplacement (59/62), diagnostic et main-d'œuvre. Hors pièces détachées.</p>
+    <p class="section-desc"><strong style="color:var(--orange);">Forfaits tout compris :</strong><br>déplacement (59/62), diagnostic et main-d'œuvre. Hors pièces détachées.</p>
 
     <div class="tarifs-grid">
       <!-- Cuisson / Audiovisuel -->
@@ -679,7 +679,7 @@
   <div class="section-inner">
     <div class="section-label">Nos engagements</div>
     <h2>Pourquoi Technik-Home ?</h2>
-    <p class="section-desc">Expertise, transparence et éco-responsabilité : on répare plutôt que remplacer.</p>
+    <p class="section-desc"><strong style="color:var(--orange);">Expertise, transparence et éco-responsabilité :</strong><br>on répare plutôt que remplacer.</p>
     <div class="why-grid">
       <div class="why-item">
         <div class="why-icon">⚡</div>
@@ -815,7 +815,7 @@
 <section id="mentions" style="background:var(--dark);padding:3rem 1.5rem;border-top:1px solid var(--border);">
   <div style="max-width:800px;margin:0 auto;">
     <h2 style="font-size:1.2rem;color:var(--white);margin-bottom:1.5rem;">Mentions légales</h2>
-    <div style="display:grid;gap:0.7rem;font-size:0.85rem;color:var(--gray);line-height:1.7;">
+    <div style="display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;font-size:0.85rem;color:var(--gray);line-height:1.7;">
       <p><strong style="color:var(--white);">Responsable du site</strong><br>Jonathan Waeytens</p>
       <p><strong style="color:var(--white);">SIRET</strong><br>795 114 263 00036</p>
       <p><strong style="color:var(--white);">Activité</strong><br>Réparation électroménager à domicile</p>
