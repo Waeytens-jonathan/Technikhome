@@ -102,7 +102,7 @@
     border: 1px solid rgba(26,115,200,0.3);
     border-radius: 100px;
     padding: 0.35rem 1rem;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--blue-light);
     font-weight: 500;
     margin-bottom: 1.5rem;
@@ -208,10 +208,10 @@
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 100px;
-    padding: 0.4rem 1rem;
-    font-size: 0.82rem;
+    padding: 0.25rem 0.9rem;
+    font-size: 0.78rem;
     color: var(--gray);
-    display: flex; align-items: center; gap: 0.4rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem; text-align: center; line-height: 1.3; white-space: normal; width: 180px; min-height: 42px;
   }
   .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-light); }
 
@@ -394,7 +394,7 @@
     margin-top: 0.5rem;
   }
   .zone-badge strong { color: var(--orange); font-size: 1.1rem; }
-  .zone-badge span { color: var(--gray); font-size: 0.82rem; display: block; margin-top: 0.2rem; }
+  .zone-badge span { color: var(--gray); font-size: 0.78rem; display: block; margin-top: 0.2rem; }
 
   /* Form */
   form {
@@ -414,7 +414,7 @@
   .field { margin-bottom: 1rem; }
   .field label {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--gray);
     margin-bottom: 0.5rem;
@@ -479,7 +479,7 @@
     padding: 2rem 4vw;
     border-top: 1px solid var(--border);
     color: var(--gray);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
   footer strong { color: var(--white); }
 
@@ -608,7 +608,7 @@
   <div class="section-inner">
     <div class="section-label">Grille 2026</div>
     <h2>Tarifs Transparents</h2>
-    <p class="section-desc"><strong style="color:var(--orange);">Forfaits tout compris :</strong><br>déplacement (59/62), diagnostic et main-d'œuvre. Hors pièces détachées.</p>
+    <p class="section-desc"><strong style="color:var(--orange);">Forfaits tout compris :</strong><br>déplacement (59/62), diagnostic et main-d'œuvre.<br>Hors pièces détachées.</p>
 
     <div class="tarifs-grid">
       <!-- Cuisson / Audiovisuel -->
@@ -813,9 +813,9 @@
 
 <!-- MENTIONS LÉGALES -->
 <section id="mentions" style="background:var(--dark);padding:3rem 1.5rem;border-top:1px solid var(--border);">
-  <div style="max-width:800px;margin:0 auto;">
-    <h2 style="font-size:1.2rem;color:var(--white);margin-bottom:1.5rem;">Mentions légales</h2>
-    <div style="display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;font-size:0.85rem;color:var(--gray);line-height:1.7;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 style="font-size:1.2rem;color:var(--white);margin-bottom:1.5rem;text-align:center;">Mentions légales</h2>
+    <div style="display:flex;flex-wrap:nowrap;justify-content:space-between;gap:1rem;font-size:0.85rem;color:var(--gray);line-height:1.7;overflow-x:auto;">
       <p><strong style="color:var(--white);">Responsable du site</strong><br>Jonathan Waeytens</p>
       <p><strong style="color:var(--white);">SIRET</strong><br>795 114 263 00036</p>
       <p><strong style="color:var(--white);">Activité</strong><br>Réparation électroménager à domicile</p>
