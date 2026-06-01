@@ -541,6 +541,88 @@
     .tarif-card { padding: 1.5rem; }
     .contact-wrapper { gap: 2rem; }
   }
+
+  /* ─── FAQ ─── */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    padding: 1.2rem 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .faq-question:hover { color: var(--orange); }
+  .faq-arrow { color: var(--orange); font-size: 0.8rem; transition: transform 0.3s; flex-shrink: 0; }
+  .faq-answer {
+    display: none;
+    color: var(--gray);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    padding-bottom: 1.2rem;
+  }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+  .faq-item.open .faq-answer { display: block; }
+
+
+  /* ─── AVIS ─── */
+  .avis-section { padding: 4rem 1.5rem; background: var(--card-bg); }
+  .avis-header { text-align: center; margin-bottom: 2.5rem; }
+  .avis-note-globale {
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    background: var(--navy); border: 1px solid var(--orange);
+    border-radius: 100px; padding: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .avis-note-globale span { font-size: 1.4rem; font-weight: 700; color: var(--white); }
+  .avis-note-globale small { color: var(--gray); font-size: 0.82rem; }
+  .avis-stars { color: var(--orange); font-size: 1.1rem; letter-spacing: 2px; }
+  .avis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+  }
+  .avis-card {
+    background: var(--navy);
+    border: 1px solid var(--orange);
+    border-radius: 16px;
+    padding: 1.4rem;
+    display: flex; flex-direction: column; gap: 0.7rem;
+  }
+  .avis-card-header { display: flex; align-items: center; gap: 0.8rem; }
+  .avis-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .avis-name { font-weight: 600; color: var(--white); font-size: 0.9rem; }
+  .avis-date { color: var(--gray); font-size: 0.75rem; }
+  .avis-text { color: var(--gray); font-size: 0.88rem; line-height: 1.6; flex: 1; }
+  .avis-btn-wrap { text-align: center; margin-top: 1rem; }
+  .avis-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--orange); color: #fff;
+    padding: 0.8rem 2rem; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: 0.92rem;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .avis-btn:hover { background: #e09400; transform: translateY(-2px); }
+
 </style>
 </head>
 <body>
@@ -551,6 +633,7 @@
   <nav>
     <a href="#services">Services</a>
     <a href="#tarifs">Tarifs</a>
+    <a href="#faq">FAQ</a>
     <a href="#contact" class="cta-nav">Nous contacter</a>
     <a href="https://calendar.app.google/Z9UrvDB3iLMgVGjH6" target="_blank" class="cta-nav" style="background:var(--orange);color:#fff;margin-left:0.5rem;">📅 Prendre RDV</a>
   </nav>
@@ -586,6 +669,104 @@
   <div class="chip"><span class="dot"></span>Assurance professionnelle</div>
   <div class="chip"><span class="dot"></span>Main d'œuvre garantie</div>
 </div>
+
+
+<!-- AVIS CLIENTS -->
+<section class="avis-section">
+  <div class="avis-header">
+    <div class="avis-note-globale">
+      <span>5.0</span>
+      <div>
+        <div class="avis-stars">★★★★★</div>
+        <small>8 avis Google</small>
+      </div>
+    </div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);letter-spacing:0.05em;">Ce que disent nos clients</h2>
+  </div>
+
+  <div class="avis-grid">
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">F</div>
+        <div><div class="avis-name">Florence N.</div><div class="avis-date">Il y a 56 min</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Jonathan est intervenu très rapidement sur mon lieu de travail, très ponctuel. Excellent service !</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">D</div>
+        <div><div class="avis-name">Djemilla B.</div><div class="avis-date">Hier</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Personne très réactive et surtout très professionnel. Encore merci pour votre intervention.</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">B</div>
+        <div><div class="avis-name">Billy B.</div><div class="avis-date">Il y a 3 jours</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Compétent, dynamisme, rapide, gentil.</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">F</div>
+        <div><div class="avis-name">Florence S.</div><div class="avis-date">Il y a 3 jours</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Excellent service et rapide, encore merci !</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">N</div>
+        <div><div class="avis-name">Nabil D.</div><div class="avis-date">Il y a 5 jours</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Intervention parfaite du début à la fin. Très professionnel, réactif et honnête.</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">P</div>
+        <div><div class="avis-name">Patricia D.</div><div class="avis-date">Il y a 6 jours</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Tres réactif, professionnel. Malheureusement tout n'est pas réparable mais je garde ses coordonnées précieusement.</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">A</div>
+        <div><div class="avis-name">Amandine B.</div><div class="avis-date">Il y a 7 jours</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Professionnel, rapidité, courtois, laisse l'endroit propre après son passage. Explique chaque étape. Tarif abordable avec facture et garantie.</p>
+    </div>
+
+    <div class="avis-card">
+      <div class="avis-card-header">
+        <div class="avis-avatar">A</div>
+        <div><div class="avis-name">Augustin</div><div class="avis-date">Il y a 1 semaine</div></div>
+      </div>
+      <div class="avis-stars">★★★★★</div>
+      <p class="avis-text">Une personne très professionnelle, serviable et d'une gentillesse folle. Je recommande très fortement !</p>
+    </div>
+
+  </div>
+
+  <div class="avis-btn-wrap">
+    <a href="https://share.google/NxKqULgK5U0cRRcd4" target="_blank" class="avis-btn">
+      ⭐ Voir tous les avis sur Google
+    </a>
+  </div>
+
+</section>
 
 <!-- SERVICES -->
 <section id="services">
@@ -838,6 +1019,116 @@
 </section>
 
 
+<!-- FAQ -->
+<section id="faq" style="padding:4rem 1.5rem;background:var(--navy);">
+  <div style="max-width:860px;margin:0 auto;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);margin-bottom:0.5rem;letter-spacing:0.05em;">FAQ</h2>
+    <p style="color:var(--gray);margin-bottom:2.5rem;font-size:0.95rem;">Questions fréquentes</p>
+    <div id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Quels appareils réparez-vous ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Lave-linge, sèche-linge, lave-vaisselle, four, plaques de cuisson, frigo, congélateur, TV et ordinateurs. Toutes marques.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Intervenez-vous à domicile ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Oui, j'interviens directement chez vous dans les secteurs 59 et 62, sans que vous ayez à déplacer votre appareil.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Combien coûte une réparation ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Les forfaits vont de 60€ à 70€ TTC selon l'appareil. Ce forfait inclut le déplacement, le diagnostic et la main-d'œuvre. Les pièces détachées sont en supplément.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Sous quel délai intervenez-vous ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">J'interviens généralement sous 24 à 48h après votre contact.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Que se passe-t-il si mon appareil est irréparable ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Si l'appareil est déclaré irréparable après diagnostic, une indemnité de 35€ TTC est facturée pour le déplacement et le diagnostic. Cette somme n'est pas remboursable.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Est-ce que la réparation est garantie ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Oui, la main-d'œuvre est garantie 15 jours après l'intervention.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Que se passe-t-il si une pièce doit être commandée ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Je commande la pièce nécessaire et vous recontacte dès sa réception pour planifier la suite de l'intervention.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Quels moyens de paiement acceptez-vous ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Carte bancaire et espèces.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Qu'est-ce que la réparation au composant ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Plutôt que de remplacer une carte électronique entière, je répare directement le composant défaillant. C'est moins cher et plus écologique. À partir de 35€ TTC.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Intervenez-vous sur les appareils encore sous garantie constructeur ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">En général, il est préférable de contacter le service après-vente de la marque afin de conserver les avantages de la garantie constructeur.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Dois-je remplacer mon appareil ou le faire réparer ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Chaque situation est différente. Je vous conseille en toute objectivité en tenant compte du coût de la réparation, de l'âge de l'appareil et de sa valeur.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Mon appareil est ancien, est-il encore réparable ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Dans de nombreux cas, oui. La disponibilité des pièces détachées et l'état général de l'appareil détermineront la faisabilité de la réparation.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Réparez-vous toutes les marques ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">J'interviens sur de nombreuses marques d'électroménager. N'hésitez pas à me contacter en précisant la marque et le modèle de votre appareil.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Pourquoi n'intervenez-vous pas sur les circuits frigorifiques (gaz) ? <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">Dans la grande majorité des cas, les fuites sont dans la mousse isolante du frigo et une réparation entraînerait sa destruction. Le but est de réparer, pas de transformer votre frigo en armoire !</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
 <!-- FOOTER -->
 <footer>
   <p><strong>TECHNIK-HOME</strong> — Réparation électroménager à domicile</p>
@@ -845,6 +1136,14 @@
 </footer>
 
 <script>
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
 function selectTarif(type) {
   document.querySelectorAll('.tarif-card').forEach(c => {
     c.classList.remove('selected');
