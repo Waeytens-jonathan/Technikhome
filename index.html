@@ -648,6 +648,14 @@
   .mode-btn.inactive:hover { background: rgba(255,255,255,0.08); color: var(--white); }
   @media (max-width: 480px) { .mode-toggle { display: none; } }
 
+
+  /* ─── TRANSITION PAGE ─── */
+  body { opacity: 0; animation: pageIn 0.4s ease forwards; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  a.mode-btn { transition: all 0.25s; }
+
+
+  @keyframes pageOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-8px); } }
 </style>
 </head>
 <body>
@@ -1290,6 +1298,21 @@ document.querySelectorAll('.service-card, .tarif-card, .why-item, .info-block').
   observer.observe(el);
 });
 </script>
+
+<script>
+// Transition sortie de page
+document.querySelectorAll('a[href]').forEach(link => {
+  const href = link.getAttribute('href');
+  if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto') && !href.startsWith('tel')) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.body.style.animation = 'pageOut 0.3s ease forwards';
+      setTimeout(() => { window.location.href = href; }, 300);
+    });
+  }
+});
+</script>
+
 </body>
 </html>
 
