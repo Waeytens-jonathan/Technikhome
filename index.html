@@ -49,21 +49,23 @@
     left: 50%;
     transform: translateX(-50%);
   }
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
     header {
-      flex-wrap: wrap;
-      justify-content: space-between;
-      padding: 0.7rem 1rem;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.6rem 1rem;
       gap: 0.5rem;
+      height: auto;
     }
     header .mode-toggle {
       position: static;
       transform: none;
-      order: 3;
-      width: 100%;
-      justify-content: center;
+      left: auto;
     }
+    nav { display: none; }
+    .hero { padding-top: 10rem; }
   }
+
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
