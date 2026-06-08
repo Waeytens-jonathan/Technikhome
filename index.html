@@ -63,6 +63,7 @@
       left: auto;
     }
     nav { display: none; }
+    .hero { padding-top: 12rem; }
   }
 
 
@@ -688,6 +689,7 @@
   <div class="mode-toggle">
     <button class="mode-btn active-elec">⚡ Électroménager</button>
     <a href="/gaming.html" class="mode-btn inactive">🎮 Consoles</a>
+    <a href="/informatique.html" class="mode-btn inactive">💻 Informatique</a>
   </div>
 
   <nav>
@@ -1334,19 +1336,15 @@ document.querySelectorAll('a[href]').forEach(link => {
 });
 </script>
 
-
 <script>
 function fixHeroPadding() {
   const header = document.querySelector('header');
   const hero = document.querySelector('.hero');
-  if (header && hero) {
-    hero.style.paddingTop = (header.offsetHeight + 20) + 'px';
-  }
+  if (header && hero) hero.style.paddingTop = (header.offsetHeight + 20) + 'px';
 }
 fixHeroPadding();
 window.addEventListener('resize', fixHeroPadding);
 </script>
-
 </body>
 </html>
 

@@ -64,6 +64,7 @@
       left: auto;
     }
     nav { display: none; }
+    .hero { padding-top: 12rem; }
   }
 
 
@@ -493,7 +494,7 @@
   <nav>
     <a href="#reparations">Réparations</a>
     <a href="#tarifs">Tarifs</a>
-    <a href="#contact" class="cta-nav">Prendre RDV</a>
+    <a href="#contact" class="cta-nav">Nous contacter</a>
   </nav>
 </header>
 
@@ -507,7 +508,7 @@
         Réparation manette PS5 drift, port HDMI cassé, Joy-Con Nintendo Switch, Xbox Series… Technik-Home répare vos consoles et manettes à Lens (62) et dans tout le Nord – Pas-de-Calais. Micro-soudure, remplacement de composants, diagnostic gratuit.
       </p>
       <div class="hero-btns">
-        <a href="#contact" class="btn-primary">🎮 Prendre RDV</a>
+        <a href="#contact" class="btn-primary">📬 Nous contacter</a>
         <a href="#tarifs" class="btn-secondary">Voir les tarifs →</a>
       </div>
     </div>
@@ -640,7 +641,7 @@
           <li>Port USB / batterie</li>
           <li>Garantie 15 jours</li>
         </ul>
-        <a href="https://calendar.app.google/Z9UrvDB3iLMgVGjH6" target="_blank" class="tarif-rdv">📅 Prendre RDV</a>
+        <a href="#contact" class="tarif-rdv">📬 Nous contacter</a>
       </div>
 
       <div class="tarif-card featured">
@@ -654,7 +655,7 @@
           <li>Nettoyage & re-pastillage</li>
           <li>Garantie 15 jours</li>
         </ul>
-        <a href="https://calendar.app.google/Z9UrvDB3iLMgVGjH6" target="_blank" class="tarif-rdv">📅 Prendre RDV</a>
+        <a href="#contact" class="tarif-rdv">📬 Nous contacter</a>
       </div>
 
       <div class="tarif-card">
@@ -668,7 +669,7 @@
           <li>Cartes mères, puces</li>
           <li>Devis gratuit avant intervention</li>
         </ul>
-        <a href="https://calendar.app.google/Z9UrvDB3iLMgVGjH6" target="_blank" class="tarif-rdv">📅 Prendre RDV</a>
+        <a href="#contact" class="tarif-rdv">📬 Nous contacter</a>
       </div>
 
     </div>
@@ -800,18 +801,14 @@ document.querySelectorAll('a[href]').forEach(link => {
 });
 </script>
 
-
 <script>
 function fixHeroPadding() {
   const header = document.querySelector('header');
   const hero = document.querySelector('.hero');
-  if (header && hero) {
-    hero.style.paddingTop = (header.offsetHeight + 20) + 'px';
-  }
+  if (header && hero) hero.style.paddingTop = (header.offsetHeight + 20) + 'px';
 }
 fixHeroPadding();
 window.addEventListener('resize', fixHeroPadding);
 </script>
-
 </body>
 </html>
