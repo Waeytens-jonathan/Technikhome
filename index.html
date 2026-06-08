@@ -63,7 +63,6 @@
       left: auto;
     }
     nav { display: none; }
-    .hero { padding-top: 14rem; }
   }
 
 
@@ -1333,6 +1332,19 @@ document.querySelectorAll('a[href]').forEach(link => {
     });
   }
 });
+</script>
+
+
+<script>
+function fixHeroPadding() {
+  const header = document.querySelector('header');
+  const hero = document.querySelector('.hero');
+  if (header && hero) {
+    hero.style.paddingTop = (header.offsetHeight + 20) + 'px';
+  }
+}
+fixHeroPadding();
+window.addEventListener('resize', fixHeroPadding);
 </script>
 
 </body>
