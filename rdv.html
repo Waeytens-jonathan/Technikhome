@@ -418,7 +418,8 @@ async function fetchSlotCounts(dateISO){
     const { data, error } = await sb
       .from('rdv')
       .select('creneau')
-      .eq('date', dateISO);
+      .eq('date', dateISO)
+      .neq('statut', 'annule');
     if(error) throw error;
     const counts = { matin: 0, apresmidi: 0 };
     (data || []).forEach(row => {
