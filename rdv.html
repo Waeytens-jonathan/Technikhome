@@ -373,9 +373,17 @@ const SUPABASE_URL = 'https://gzrqkapwjwlwkvwtykfi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const SLOT_LIMITS = { matin: 2, apresmidi: 4 };
 const SLOT_LABELS = { matin: 'Matin (10h-12h)', apresmidi: 'Après-midi (12h-18h)' };
 const DOW_LABELS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+
+// Quotas par créneau : différent le samedi (jour 6) des autres jours ouvrés
+function getSlotLimit(dateISO, slot){
+  const dow = new Date(dateISO + 'T00:00:00').getDay();
+  if(dow === 6){ // samedi
+    return { matin: 2, apresmidi: 2 }[slot];
+  }
+  return { matin: 2, apresmidi: 4 }[slot];
+}
 
 let selectedDate = null;   // format 'YYYY-MM-DD'
 let selectedSlot = null;   // 'matin' | 'apresmidi'
@@ -463,7 +471,7 @@ async function renderSlots(){
   grid.querySelectorAll('.slot-card').forEach(card => {
     const slot = card.dataset.slot;
     const used = counts[slot] || 0;
-    const max = SLOT_LIMITS[slot];
+    const max = getSlotLimit(selectedDate, slot);
     const statusEl = card.querySelector('.slot-status');
     if(used >= max){
       card.classList.add('full');
