@@ -324,6 +324,10 @@
         <label for="panne">Description de la panne</label>
         <textarea id="panne" placeholder="Décrivez le problème, la marque, le modèle si possible…" required></textarea>
       </div>
+      <div class="field">
+        <label for="note-technicien">Note pour le technicien <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
+        <textarea id="note-technicien" placeholder="Ex : ne pas sonner, maison bleue, code portail 1234…"></textarea>
+      </div>
     </div>
 
     <div class="card">
@@ -349,7 +353,11 @@
       📅 Confirmer la demande de rendez-vous
     </button>
 
-    <div id="form-success">✅ Votre demande a bien été envoyée ! Nous vous recontactons rapidement pour confirmer.</div>
+    <div id="form-success">
+      <div>✅ Votre rendez-vous est confirmé !</div>
+      <div style="font-weight:400;font-size:0.85rem;margin-top:0.5rem;color:var(--white);">Le technicien vous contactera par SMS pour annoncer son arrivée quelques minutes avant l'intervention.</div>
+      <a href="/" class="form-submit" style="text-decoration:none;margin:1rem auto 0;max-width:260px;">← Retour au site</a>
+    </div>
     <div id="form-error">⚠️ Une erreur est survenue. Merci de réessayer ou de nous appeler directement.</div>
   </form>
 </main>
@@ -513,6 +521,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     email: document.getElementById('email').value.trim(),
     appareil: document.getElementById('appareil').value,
     panne: document.getElementById('panne').value.trim(),
+    note_technicien: document.getElementById('note-technicien').value.trim(),
     statut: 'en_attente'
   };
 
@@ -526,8 +535,9 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     selectedSlot = null;
     slotCounts = {};
     submitBtn.textContent = '📅 Confirmer la demande de rendez-vous';
+    submitBtn.style.display = 'none';
     renderDateScroller();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('form-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }catch(e){
     console.error('Erreur envoi RDV :', e);
     showToastError('Impossible d\'envoyer votre demande. Appelez-nous au 07 59 70 54 97.');
