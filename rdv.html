@@ -536,6 +536,28 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
   try{
     const { error } = await sb.from('rdv').insert(row);
     if(error) throw error;
+
+    // Envoi de l'email de confirmation (non bloquant : un échec ici n'annule pas le RDV)
+    try{
+      await sb.functions.invoke('send-rdv-confirmation', {
+        body: {
+          app_id: row.app_id,
+          nom: row.nom,
+          prenom: row.prenom,
+          email: row.email,
+          date: row.date,
+          creneau: row.creneau,
+          adresse: row.adresse,
+          cp: row.cp,
+          ville: row.ville,
+          appareil: row.appareil,
+          panne: row.panne
+        }
+      });
+    }catch(emailErr){
+      console.error('Erreur envoi email confirmation :', emailErr);
+    }
+
     document.getElementById('form-success').style.display = 'block';
     document.getElementById('rdv-form').reset();
     document.querySelectorAll('.date-chip, .slot-card').forEach(c => c.classList.remove('selected'));
