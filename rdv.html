@@ -390,7 +390,12 @@ let selectedSlot = null;   // 'matin' | 'apresmidi'
 let slotCounts = {};       // cache: { 'YYYY-MM-DD': { matin: n, apresmidi: n } }
 
 function toISODate(d){
-  return d.toISOString().slice(0,10);
+  // Construit la date au format YYYY-MM-DD à partir des composants LOCAUX
+  // (toISOString() convertit en UTC et peut décaler d'un jour selon le fuseau horaire)
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function buildAvailableDates(){
