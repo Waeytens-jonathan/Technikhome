@@ -511,6 +511,16 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     return;
   }
 
+  // Sécurité : on ne prend jamais de RDV un dimanche, même si la date a été forcée d'une façon ou d'une autre
+  const dow = new Date(selectedDate + 'T00:00:00').getDay();
+  if(dow === 0){
+    showToastError('Les rendez-vous ne sont pas disponibles le dimanche. Merci de choisir une autre date.');
+    selectedDate = null;
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+    updateSubmitState();
+    return;
+  }
+
   const submitBtn = document.getElementById('submit-btn');
   submitBtn.disabled = true;
   submitBtn.textContent = 'Envoi en cours…';
