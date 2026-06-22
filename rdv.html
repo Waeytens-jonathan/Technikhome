@@ -373,46 +373,88 @@ const SUPABASE_URL = 'https://gzrqkapwjwlwkvwtykfi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const SLOT_LABELS = { matin: 'Matin (10h-12h)', apresmidi: 'Après-midi (12h-18h)' };
 const DOW_LABELS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 
-// Quotas par créneau : différent le samedi (jour 6) des autres jours ouvrés
-function getSlotLimit(dateISO, slot){
-  const dow = new Date(dateISO + 'T00:00:00').getDay();
-  if(dow === 6){ // samedi
-    return { matin: 2, apresmidi: 2 }[slot];
+// ---------- Config agenda (chargée depuis Supabase) ----------
+let agendaCfg = {
+  matinDebut: '08:00', matinFin: '12:00',
+  amDebut: '12:00',   amFin:   '18:00',
+  quotaMatin: 2, quotaAM: 4,
+  quotaMatinSam: 2, quotaAMSam: 2,
+  joursBlockes: []
+};
+
+async function loadAgendaConfig(){
+  try{
+    const { data, error } = await sb.from('agenda_config').select('*').eq('id',1).single();
+    if(error) throw error;
+    agendaCfg = {
+      matinDebut:    data.matin_debut    || '08:00',
+      matinFin:      data.matin_fin      || '12:00',
+      amDebut:       data.am_debut       || '12:00',
+      amFin:         data.am_fin         || '18:00',
+      quotaMatin:    data.quota_matin    ?? 2,
+      quotaAM:       data.quota_am       ?? 4,
+      quotaMatinSam: data.quota_matin_sam ?? 2,
+      quotaAMSam:    data.quota_am_sam   ?? 2,
+      joursBlockes:  data.jours_bloques  || []
+    };
+  }catch(e){
+    console.error('Erreur chargement config agenda :', e);
   }
-  return { matin: 2, apresmidi: 4 }[slot];
 }
 
-let selectedDate = null;   // format 'YYYY-MM-DD'
-let selectedSlot = null;   // 'matin' | 'apresmidi'
-let slotCounts = {};       // cache: { 'YYYY-MM-DD': { matin: n, apresmidi: n } }
+function isDateBlocked(iso){
+  return agendaCfg.joursBlockes.some(b => iso >= b.debut && iso <= b.fin);
+}
+
+function getSlotLimit(dateISO, slot){
+  const dow = new Date(dateISO + 'T00:00:00').getDay();
+  if(dow === 6) return slot === 'matin' ? agendaCfg.quotaMatinSam : agendaCfg.quotaAMSam;
+  return slot === 'matin' ? agendaCfg.quotaMatin : agendaCfg.quotaAM;
+}
+
+function getSlotLabel(slot){
+  if(slot === 'matin')     return `🌅 Matin · ${agendaCfg.matinDebut}–${agendaCfg.matinFin}`;
+  if(slot === 'apresmidi') return `☀️ Après-midi · ${agendaCfg.amDebut}–${agendaCfg.amFin}`;
+  return slot;
+}
+
+// Pour le récap de confirmation
+const SLOT_LABELS = {
+  get matin()     { return `Matin (${agendaCfg.matinDebut}–${agendaCfg.matinFin})`; },
+  get apresmidi() { return `Après-midi (${agendaCfg.amDebut}–${agendaCfg.amFin})`; }
+};
+
+let selectedDate = null;
+let selectedSlot = null;
+let slotCounts = {};
 
 function toISODate(d){
-  // Construit la date au format YYYY-MM-DD à partir des composants LOCAUX
-  // (toISOString() convertit en UTC et peut décaler d'un jour selon le fuseau horaire)
-  const year = d.getFullYear();
+  const year  = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const day   = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function buildAvailableDates(){
-  // Lundi à samedi, à partir de demain, sur 14 jours
+  // Lundi à samedi, à partir de demain, sur 30 jours calendaires (max 20 jours ouvrés)
+  // Exclut dimanches ET jours bloqués
   const dates = [];
-  let d = new Date();
-  d.setHours(0,0,0,0);
-  let added = 0;
-  let cursor = new Date(d);
+  let cursor = new Date();
+  cursor.setHours(0,0,0,0);
   cursor.setDate(cursor.getDate() + 1);
-  while(added < 14){
-    const dow = cursor.getDay(); // 0 = dimanche
-    if(dow !== 0){
+  let added = 0;
+  while(added < 20){
+    const iso = toISODate(cursor);
+    const dow = cursor.getDay();
+    if(dow !== 0 && !isDateBlocked(iso)){
       dates.push(new Date(cursor));
       added++;
     }
     cursor.setDate(cursor.getDate() + 1);
+    // Sécurité : ne pas boucler indéfiniment si trop de jours bloqués
+    if(cursor - new Date() > 1000 * 60 * 60 * 24 * 120) break;
   }
   return dates;
 }
@@ -421,6 +463,12 @@ function renderDateScroller(){
   const dates = buildAvailableDates();
   const scroller = document.getElementById('date-scroller');
   scroller.innerHTML = '';
+
+  if(dates.length === 0){
+    scroller.innerHTML = '<p style="color:#ff6b6b;font-size:0.9rem;padding:1rem 0;">Aucune disponibilité dans les prochaines semaines. Appelez-nous au 07 59 70 54 97.</p>';
+    return;
+  }
+
   dates.forEach((d, i) => {
     const iso = toISODate(d);
     const chip = document.createElement('div');
@@ -429,7 +477,7 @@ function renderDateScroller(){
     chip.innerHTML = `<div class="dow">${DOW_LABELS[d.getDay()]}</div><div class="dnum">${d.getDate()}</div>`;
     chip.addEventListener('click', () => selectDate(iso, chip));
     scroller.appendChild(chip);
-    if(i === 0) selectDate(iso, chip); // auto-sélectionne le premier jour disponible
+    if(i === 0) selectDate(iso, chip);
   });
 }
 
@@ -465,26 +513,47 @@ async function selectDate(iso, chipEl){
 
 async function renderSlots(){
   const grid = document.getElementById('slots-grid');
+
+  // Mettre à jour les titres/horaires des cards selon la config
   grid.querySelectorAll('.slot-card').forEach(c => {
+    const slot = c.dataset.slot;
+    const titleEl = c.querySelector('.slot-title');
+    const hoursEl = c.querySelector('.slot-hours');
+    if(titleEl) titleEl.textContent = slot === 'matin' ? '🌅 Matin' : '☀️ Après-midi';
+    if(hoursEl) hoursEl.textContent = slot === 'matin'
+      ? `${agendaCfg.matinDebut} – ${agendaCfg.matinFin}`
+      : `${agendaCfg.amDebut} – ${agendaCfg.amFin}`;
     c.querySelector('.slot-status').textContent = 'Chargement…';
     c.querySelector('.slot-status').className = 'slot-status';
     c.classList.remove('full', 'selected');
+    c.onclick = null;
   });
+
+  // Si le jour est bloqué (double sécurité côté client)
+  if(selectedDate && isDateBlocked(selectedDate)){
+    grid.querySelectorAll('.slot-card').forEach(card => {
+      card.classList.add('full');
+      card.querySelector('.slot-status').textContent = 'Indisponible';
+      card.querySelector('.slot-status').classList.add('full-text');
+    });
+    return;
+  }
 
   const counts = await fetchSlotCounts(selectedDate);
 
   grid.querySelectorAll('.slot-card').forEach(card => {
     const slot = card.dataset.slot;
     const used = counts[slot] || 0;
-    const max = getSlotLimit(selectedDate, slot);
+    const max  = getSlotLimit(selectedDate, slot);
     const statusEl = card.querySelector('.slot-status');
-    if(used >= max){
+    if(max === 0 || used >= max){
       card.classList.add('full');
       statusEl.textContent = 'Complet';
       statusEl.classList.add('full-text');
       card.onclick = null;
     } else {
-      statusEl.textContent = `${max - used} place${max - used > 1 ? 's' : ''} disponible${max - used > 1 ? 's' : ''}`;
+      const dispo = max - used;
+      statusEl.textContent = `${dispo} place${dispo > 1 ? 's' : ''} disponible${dispo > 1 ? 's' : ''}`;
       statusEl.classList.add('ok');
       card.onclick = () => selectSlot(slot, card);
     }
@@ -516,13 +585,33 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  // Sécurité : on ne prend jamais de RDV un dimanche, même si la date a été forcée d'une façon ou d'une autre
   const dow = new Date(selectedDate + 'T00:00:00').getDay();
   if(dow === 0){
-    showToastError('Les rendez-vous ne sont pas disponibles le dimanche. Merci de choisir une autre date.');
+    showToastError('Les rendez-vous ne sont pas disponibles le dimanche.');
     selectedDate = null;
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
     updateSubmitState();
+    return;
+  }
+
+  // Double sécurité : jour bloqué
+  if(isDateBlocked(selectedDate)){
+    showToastError('Cette date n\'est plus disponible. Merci de choisir une autre date.');
+    selectedDate = null;
+    selectedSlot = null;
+    slotCounts = {};
+    renderDateScroller();
+    return;
+  }
+
+  // Double sécurité : vérifier quota en temps réel
+  delete slotCounts[selectedDate]; // forcer rechargement
+  const freshCounts = await fetchSlotCounts(selectedDate);
+  const usedFresh = freshCounts[selectedSlot] || 0;
+  const maxFresh  = getSlotLimit(selectedDate, selectedSlot);
+  if(usedFresh >= maxFresh){
+    showToastError('Ce créneau vient d\'être complet. Merci de choisir un autre créneau ou une autre date.');
+    await renderSlots();
     return;
   }
 
@@ -552,21 +641,14 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     const { error } = await sb.from('rdv').insert(row);
     if(error) throw error;
 
-    // Envoi de l'email de confirmation (non bloquant : un échec ici n'annule pas le RDV)
     try{
       await sb.functions.invoke('send-rdv-confirmation', {
         body: {
           app_id: row.app_id,
-          nom: row.nom,
-          prenom: row.prenom,
-          email: row.email,
-          date: row.date,
-          creneau: row.creneau,
-          adresse: row.adresse,
-          cp: row.cp,
-          ville: row.ville,
-          appareil: row.appareil,
-          panne: row.panne
+          nom: row.nom, prenom: row.prenom, email: row.email,
+          date: row.date, creneau: row.creneau,
+          adresse: row.adresse, cp: row.cp, ville: row.ville,
+          appareil: row.appareil, panne: row.panne
         }
       });
     }catch(emailErr){
@@ -576,9 +658,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     document.getElementById('form-success').style.display = 'block';
     document.getElementById('rdv-form').reset();
     document.querySelectorAll('.date-chip, .slot-card').forEach(c => c.classList.remove('selected'));
-    selectedDate = null;
-    selectedSlot = null;
-    slotCounts = {};
+    selectedDate = null; selectedSlot = null; slotCounts = {};
     submitBtn.textContent = '📅 Confirmer la demande de rendez-vous';
     submitBtn.style.display = 'none';
     renderDateScroller();
@@ -591,7 +671,8 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
   updateSubmitState();
 });
 
-renderDateScroller();
+// ---------- Init : charger la config PUIS afficher le calendrier ----------
+loadAgendaConfig().then(() => renderDateScroller());
 </script>
 </body>
 </html>
