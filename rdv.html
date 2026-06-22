@@ -660,6 +660,45 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     const { error } = await sb.from('rdv').insert(row);
     if(error) throw error;
 
+    // Créer ou retrouver la fiche client automatiquement
+    try{
+      let clientId = null;
+      // Chercher par tel ou email
+      const tel   = row.tel   || '';
+      const email = row.email || '';
+      let existing = null;
+      if(tel){
+        const { data } = await sb.from('clients').select('app_id').eq('tel', tel).maybeSingle();
+        existing = data;
+      }
+      if(!existing && email){
+        const { data } = await sb.from('clients').select('app_id').eq('email', email).maybeSingle();
+        existing = data;
+      }
+      if(existing){
+        clientId = existing.app_id;
+      } else {
+        const newClient = {
+          app_id:  'cli_' + Date.now(),
+          nom:     row.nom     || '',
+          prenom:  row.prenom  || '',
+          tel:     row.tel     || '',
+          email:   row.email   || '',
+          adresse: row.adresse || '',
+          cp:      row.cp      || '',
+          ville:   row.ville   || '',
+        };
+        const { data: ins } = await sb.from('clients').insert(newClient).select('app_id').single();
+        clientId = ins && ins.app_id;
+      }
+      // Lier le RDV au client
+      if(clientId){
+        await sb.from('rdv').update({ client_id: clientId }).eq('app_id', row.app_id);
+      }
+    }catch(clientErr){
+      console.error('Erreur création client auto :', clientErr);
+    }
+
     try{
       await sb.functions.invoke('send-rdv-confirmation', {
         body: {
