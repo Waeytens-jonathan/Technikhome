@@ -165,6 +165,14 @@
     background: var(--blue);
     border-color: var(--blue);
   }
+  .date-chip.blocked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: rgba(224,88,79,0.4);
+    background: rgba(224,88,79,0.06);
+  }
+  .date-chip.blocked:hover { border-color: rgba(224,88,79,0.4); }
+  .date-chip.blocked .dow { color: #e0584f; }
   .date-chip .dow { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; }
   .date-chip.selected .dow { color: rgba(255,255,255,0.85); }
   .date-chip .dnum { font-size: 1.3rem; font-weight: 600; font-family: 'Bebas Neue', sans-serif; }
@@ -438,8 +446,8 @@ function toISODate(d){
 }
 
 function buildAvailableDates(){
-  // Lundi à samedi, à partir de demain, sur 30 jours calendaires (max 20 jours ouvrés)
-  // Exclut dimanches ET jours bloqués
+  // Lundi à samedi, à partir de demain, sur 20 jours ouvrés
+  // Inclut les jours bloqués (affichés comme indisponibles)
   const dates = [];
   let cursor = new Date();
   cursor.setHours(0,0,0,0);
@@ -448,12 +456,11 @@ function buildAvailableDates(){
   while(added < 20){
     const iso = toISODate(cursor);
     const dow = cursor.getDay();
-    if(dow !== 0 && !isDateBlocked(iso)){
+    if(dow !== 0){ // exclure uniquement les dimanches
       dates.push(new Date(cursor));
       added++;
     }
     cursor.setDate(cursor.getDate() + 1);
-    // Sécurité : ne pas boucler indéfiniment si trop de jours bloqués
     if(cursor - new Date() > 1000 * 60 * 60 * 24 * 120) break;
   }
   return dates;
@@ -469,16 +476,26 @@ function renderDateScroller(){
     return;
   }
 
+  let firstSelectable = null;
   dates.forEach((d, i) => {
     const iso = toISODate(d);
+    const blocked = isDateBlocked(iso);
     const chip = document.createElement('div');
-    chip.className = 'date-chip';
+    chip.className = 'date-chip' + (blocked ? ' blocked' : '');
     chip.dataset.date = iso;
     chip.innerHTML = `<div class="dow">${DOW_LABELS[d.getDay()]}</div><div class="dnum">${d.getDate()}</div>`;
-    chip.addEventListener('click', () => selectDate(iso, chip));
+    if(blocked){
+      chip.title = 'Indisponible';
+      // non cliquable
+    } else {
+      chip.addEventListener('click', () => selectDate(iso, chip));
+      if(!firstSelectable) firstSelectable = { iso, chip };
+    }
     scroller.appendChild(chip);
-    if(i === 0) selectDate(iso, chip);
   });
+
+  // Sélectionner le premier jour disponible
+  if(firstSelectable) selectDate(firstSelectable.iso, firstSelectable.chip);
 }
 
 async function fetchSlotCounts(dateISO){
@@ -529,12 +546,14 @@ async function renderSlots(){
     c.onclick = null;
   });
 
-  // Si le jour est bloqué (double sécurité côté client)
+  // Si le jour est bloqué : afficher "Fermé" sur les créneaux
   if(selectedDate && isDateBlocked(selectedDate)){
     grid.querySelectorAll('.slot-card').forEach(card => {
       card.classList.add('full');
-      card.querySelector('.slot-status').textContent = 'Indisponible';
-      card.querySelector('.slot-status').classList.add('full-text');
+      const statusEl = card.querySelector('.slot-status');
+      statusEl.textContent = '🔒 Fermé ce jour';
+      statusEl.classList.add('full-text');
+      card.onclick = null;
     });
     return;
   }
