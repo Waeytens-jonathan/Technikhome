@@ -663,9 +663,8 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     // Créer ou retrouver la fiche client automatiquement
     try{
       let clientId = null;
-      // Chercher par tel ou email
-      const tel   = row.tel   || '';
-      const email = row.email || '';
+      const tel   = (row.tel   || '').trim();
+      const email = (row.email || '').trim();
       let existing = null;
       if(tel){
         const { data } = await sb.from('clients').select('app_id').eq('tel', tel).maybeSingle();
@@ -679,19 +678,19 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
         clientId = existing.app_id;
       } else {
         const newClient = {
-          app_id:  'cli_' + Date.now(),
+          app_id:  'cli_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
           nom:     row.nom     || '',
           prenom:  row.prenom  || '',
-          tel:     row.tel     || '',
-          email:   row.email   || '',
+          tel:     tel,
+          email:   email,
           adresse: row.adresse || '',
           cp:      row.cp      || '',
           ville:   row.ville   || '',
         };
-        const { data: ins } = await sb.from('clients').insert(newClient).select('app_id').single();
+        const { data: ins, error: insErr } = await sb.from('clients').insert(newClient).select('app_id').single();
+        if(insErr) throw insErr;
         clientId = ins && ins.app_id;
       }
-      // Lier le RDV au client
       if(clientId){
         await sb.from('rdv').update({ client_id: clientId }).eq('app_id', row.app_id);
       }
