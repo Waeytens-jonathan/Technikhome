@@ -63,6 +63,7 @@
       left: auto;
     }
     nav { display: none; }
+    .mobile-rdv-btn { display: inline-block; }
     .hero { padding-top: 12rem; }
   }
 
@@ -93,6 +94,19 @@
     transition: background .2s !important;
   }
   .cta-nav:hover { background: var(--blue-light) !important; }
+
+  /* Bouton RDV mobile — caché sur desktop, visible sur mobile */
+  .mobile-rdv-btn {
+    display: none;
+    background: var(--orange);
+    color: #fff !important;
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+  }
 
   /* ─── HERO ─── */
   .hero {
@@ -691,6 +705,9 @@
     <a href="/gaming.html" class="mode-btn inactive">🎮 Consoles</a>
     <a href="/informatique.html" class="mode-btn inactive">💻 Informatique</a>
   </div>
+
+  <!-- Bouton RDV visible uniquement sur mobile -->
+  <a href="/rdv.html" class="mobile-rdv-btn">📅 Prendre RDV</a>
 
   <nav>
     <a href="#services">Services</a>
