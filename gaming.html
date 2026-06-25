@@ -598,7 +598,7 @@
     </div>
     <div class="info-banner" style="margin-top:1rem;">
       <div class="icon">🚗</div>
-      <p><strong>Vous ne pouvez pas vous déplacer ?</strong> Technik-Home peut venir récupérer votre matériel à domicile pour un forfait de <strong>25€ TTC</strong>, dans les secteurs 59 et 62.</p>
+      <p><strong>Vous ne pouvez pas vous déplacer ?</strong> Technik-Home peut venir récupérer votre matériel à domicile pour un forfait de <strong id="prix-recup-gaming">25€ TTC</strong>, dans les secteurs 59 et 62.</p>
     </div>
   </div>
 </section>
@@ -634,7 +634,7 @@
       <div class="tarif-card">
         <div class="tarif-icon">🎮</div>
         <div class="tarif-name">Réparation Manette</div>
-        <div class="tarif-price">25<span>€+</span></div>
+        <div class="tarif-price" id="prix-manette">25<span>€+</span></div>
         <p class="tarif-note">Selon pièces nécessaires</p>
         <ul class="tarif-features">
           <li>Diagnostic complet</li>
@@ -648,7 +648,7 @@
       <div class="tarif-card featured">
         <div class="tarif-icon">🕹️</div>
         <div class="tarif-name">Réparation Console</div>
-        <div class="tarif-price">45<span>€+</span></div>
+        <div class="tarif-price" id="prix-console">45<span>€+</span></div>
         <p class="tarif-note">Selon modèle & panne</p>
         <ul class="tarif-features">
           <li>Diagnostic complet</li>
@@ -662,7 +662,7 @@
       <div class="tarif-card">
         <div class="tarif-icon">🔬</div>
         <div class="tarif-name">Micro-soudure</div>
-        <div class="tarif-price">35<span>€+</span></div>
+        <div class="tarif-price" id="prix-microsoudure">35<span>€+</span></div>
         <p class="tarif-note">Sur devis après diagnostic</p>
         <ul class="tarif-features">
           <li>Analyse composants</li>
@@ -810,6 +810,28 @@ function fixHeroPadding() {
 }
 fixHeroPadding();
 window.addEventListener('resize', fixHeroPadding);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function loadTarifs(){
+  try{
+    const sb = window.supabase.createClient(
+      'https://gzrqkapwjwlwkvwtykfi.supabase.co',
+      'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
+    );
+    const { data, error } = await sb.from('agenda_config').select('tarif_manette,tarif_console,tarif_microsoudure,tarif_recup_gaming').eq('id',1).single();
+    if(error || !data) return;
+    const setCarte = (id, val) => {
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = val + '<span>€+</span>';
+    };
+    setCarte('prix-manette',      data.tarif_manette      ?? 25);
+    setCarte('prix-console',       data.tarif_console      ?? 45);
+    setCarte('prix-microsoudure',  data.tarif_microsoudure ?? 35);
+    const elR = document.getElementById('prix-recup-gaming');
+    if(elR) elR.textContent = (data.tarif_recup_gaming ?? 25) + '€ TTC';
+  }catch(e){ console.error('Erreur chargement tarifs :', e); }
+})();
 </script>
 </body>
 </html>
