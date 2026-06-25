@@ -530,7 +530,7 @@
     </div>
     <div class="info-banner">
       <div class="icon">🚗</div>
-      <p><strong>Vous ne pouvez pas vous déplacer ?</strong> Technik-Home peut venir récupérer votre matériel à domicile pour un forfait de <strong>25€ TTC</strong>, dans les secteurs 59 et 62.</p>
+      <p><strong>Vous ne pouvez pas vous déplacer ?</strong> Technik-Home peut venir récupérer votre matériel à domicile pour un forfait de <strong id="prix-recup-info">25€ TTC</strong>, dans les secteurs 59 et 62.</p>
     </div>
   </div>
 </section>
@@ -569,7 +569,7 @@
       <div class="tarif-card">
         <div class="tarif-icon">📱</div>
         <div class="tarif-name">Téléphone / Tablette</div>
-        <div class="tarif-price">35<span>€+</span></div>
+        <div class="tarif-price" id="prix-tel">35<span>€+</span></div>
         <p class="tarif-note">Selon pièces nécessaires</p>
         <ul class="tarif-features">
           <li>Écran, batterie, charge</li>
@@ -582,7 +582,7 @@
       <div class="tarif-card featured">
         <div class="tarif-icon">💻</div>
         <div class="tarif-name">PC Portable</div>
-        <div class="tarif-price">50<span>€+</span></div>
+        <div class="tarif-price" id="prix-pc-portable">50<span>€+</span></div>
         <p class="tarif-note">Selon modèle & panne</p>
         <ul class="tarif-features">
           <li>Écran, batterie, clavier</li>
@@ -595,7 +595,7 @@
       <div class="tarif-card">
         <div class="tarif-icon">🖥️</div>
         <div class="tarif-name">PC Fixe / Mac</div>
-        <div class="tarif-price">45<span>€+</span></div>
+        <div class="tarif-price" id="prix-pc-fixe">45<span>€+</span></div>
         <p class="tarif-note">Main-d'œuvre incluse</p>
         <ul class="tarif-features">
           <li>Panne matérielle / logicielle</li>
@@ -729,6 +729,28 @@ document.querySelectorAll('a[href]').forEach(link => {
     });
   }
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function loadTarifs(){
+  try{
+    const sb = window.supabase.createClient(
+      'https://gzrqkapwjwlwkvwtykfi.supabase.co',
+      'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
+    );
+    const { data, error } = await sb.from('agenda_config').select('tarif_tel,tarif_pc_portable,tarif_pc_fixe,tarif_recup_info').eq('id',1).single();
+    if(error || !data) return;
+    const setCarte = (id, val) => {
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = val + '<span>€+</span>';
+    };
+    setCarte('prix-tel',         data.tarif_tel         ?? 35);
+    setCarte('prix-pc-portable', data.tarif_pc_portable ?? 50);
+    setCarte('prix-pc-fixe',     data.tarif_pc_fixe     ?? 45);
+    const elR = document.getElementById('prix-recup-info');
+    if(elR) elR.textContent = (data.tarif_recup_info ?? 25) + '€ TTC';
+  }catch(e){ console.error('Erreur chargement tarifs :', e); }
+})();
 </script>
 </body>
 </html>
