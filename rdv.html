@@ -306,7 +306,6 @@
           <input type="text" id="ville" required>
         </div>
       </div>
-      <div id="distance-info" style="display:none;background:rgba(26,115,200,0.1);border:1px solid rgba(26,115,200,0.3);border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.3rem;font-size:0.85rem;color:var(--blue-light);">🗺️ Distance depuis Lens : <strong id="distance-km"></strong></div>
       <div class="form-row">
         <div class="field">
           <label for="tel">Téléphone</label>
@@ -744,7 +743,6 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
 });
 
 // ---------- Autocomplétion adresse ----------
-const LENS_COORDS = { lon: 2.8275, lat: 50.4322 }; // Lens centre
 
 let adresseTimeout = null;
 const adresseInput = document.getElementById('adresse');
@@ -765,21 +763,22 @@ async function fetchAdresseSuggestions(q){
     const results = data.results || [];
     if(!results.length){ adresseSuggestionsBox.style.display = 'none'; return; }
     adresseSuggestionsBox.innerHTML = results.map((r,i) => `
-      <div class="adresse-item" data-idx="${i}" data-zip="${r.zipcode||''}" data-city="${r.city||''}" data-lat="${r.y||''}" data-lon="${r.x||''}" data-street="${r.street||''}"
-        style="padding:0.55rem 0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.88rem;hover:background:rgba(255,255,255,0.05);">
+      <div class="adresse-item" data-idx="${i}" data-zip="${r.zipcode||''}" data-city="${r.city||''}" data-lat="${r.y||''}" data-lon="${r.x||''}" data-street="${r.street||''}" data-fulltext="${r.fulltext||''}"
+        style="padding:0.55rem 0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.88rem;">
         ${r.fulltext || ''}
       </div>`).join('');
     adresseSuggestionsBox.style.display = 'block';
     adresseSuggestionsBox.querySelectorAll('.adresse-item').forEach(el => {
       el.addEventListener('click', () => {
-        adresseInput.value = el.dataset.street || '';
+        // Extraire juste la partie adresse (sans CP et ville) depuis fulltext
+        // fulltext = "12 Rue Emile Zola, 62300 Lens" → on prend avant la virgule
+        const fulltext = el.dataset.fulltext || '';
+        const adresseOnly = fulltext.split(',')[0].trim() || el.dataset.street || '';
+        adresseInput.value = adresseOnly;
         document.getElementById('cp').value   = el.dataset.zip  || '';
         document.getElementById('ville').value = el.dataset.city || '';
         adresseSuggestionsBox.style.display = 'none';
         validateCP(el.dataset.zip);
-        if(el.dataset.lat && el.dataset.lon){
-          fetchDistance(parseFloat(el.dataset.lat), parseFloat(el.dataset.lon));
-        }
       });
     });
   }catch(e){ adresseSuggestionsBox.style.display = 'none'; }
@@ -803,47 +802,11 @@ function validateCP(cp){
 
 document.getElementById('cp').addEventListener('input', e => {
   validateCP(e.target.value);
-  // Si CP complet (5 chiffres) et pas encore d'adresse géocodée, chercher la distance via le CP
-  if(e.target.value.length === 5){
-    fetchDistanceByCP(e.target.value, document.getElementById('ville').value);
-  } else {
-    document.getElementById('distance-info').style.display = 'none';
-  }
+
 });
 
 // ---------- Distance via IGN ----------
-async function fetchDistance(lat, lon){
-  try{
-    const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&profile=car&optimization=shortest&start=${LENS_COORDS.lon},${LENS_COORDS.lat}&end=${lon},${lat}&geometryFormat=geojson`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const distM = data.distance || (data.routes && data.routes[0] && data.routes[0].distance);
-    if(distM){
-      const distKm = (distM / 1000).toFixed(1);
-      document.getElementById('distance-km').textContent = distKm + ' km';
-      document.getElementById('distance-info').style.display = 'block';
-    }
-  }catch(e){
-    // Fallback : distance à vol d'oiseau
-    const R = 6371;
-    const dLat = (lat - LENS_COORDS.lat) * Math.PI / 180;
-    const dLon = (lon - LENS_COORDS.lon) * Math.PI / 180;
-    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(LENS_COORDS.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-    const dist = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
-    document.getElementById('distance-km').textContent = `~${dist} km (vol d'oiseau)`;
-    document.getElementById('distance-info').style.display = 'block';
-  }
-}
 
-async function fetchDistanceByCP(cp, ville){
-  try{
-    const q = encodeURIComponent(`${cp} ${ville}`);
-    const res = await fetch(`https://data.geopf.fr/geocodage/completion/?text=${q}&type=Municipality&maximumResponses=1`);
-    const data = await res.json();
-    const r = data.results && data.results[0];
-    if(r && r.x && r.y) fetchDistance(parseFloat(r.y), parseFloat(r.x));
-  }catch(e){}
-}
 
 // ---------- Validation CP à la soumission ----------
 const origSubmit = document.getElementById('rdv-form').onsubmit;
