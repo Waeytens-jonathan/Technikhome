@@ -291,6 +291,10 @@
         <input type="text" id="adresse" placeholder="Numéro et rue" required autocomplete="off">
         <div id="adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a2535;border:1px solid rgba(255,255,255,0.1);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4);"></div>
       </div>
+      <div class="field">
+        <label for="adresse2">Complément d'adresse <span style="font-size:0.8rem;font-weight:400;opacity:0.7;">(optionnel)</span></label>
+        <input type="text" id="adresse2" placeholder="Appartement, bâtiment, étage…" autocomplete="off">
+      </div>
       <div class="form-row">
         <div class="field">
           <label for="cp">Code postal</label>
@@ -656,6 +660,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     nom: document.getElementById('nom').value.trim(),
     prenom: document.getElementById('prenom').value.trim(),
     adresse: document.getElementById('adresse').value.trim(),
+    adresse2: document.getElementById('adresse2').value.trim() || null,
     cp: document.getElementById('cp').value.trim(),
     ville: document.getElementById('ville').value.trim(),
     tel: document.getElementById('tel').value.trim(),
