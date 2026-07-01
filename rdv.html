@@ -286,20 +286,23 @@
           <input type="text" id="nom" required>
         </div>
       </div>
-      <div class="field">
+      <div class="field" style="position:relative;">
         <label for="adresse">Adresse</label>
-        <input type="text" id="adresse" placeholder="Numéro et rue" required>
+        <input type="text" id="adresse" placeholder="Numéro et rue" required autocomplete="off">
+        <div id="adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a2535;border:1px solid rgba(255,255,255,0.1);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4);"></div>
       </div>
       <div class="form-row">
         <div class="field">
           <label for="cp">Code postal</label>
-          <input type="text" id="cp" inputmode="numeric" required>
+          <input type="text" id="cp" inputmode="numeric" required maxlength="5">
+          <div id="cp-error" style="display:none;color:#ff6b6b;font-size:0.8rem;margin-top:0.3rem;">⚠️ Nous n'intervenons que dans les départements 59 et 62.</div>
         </div>
         <div class="field">
           <label for="ville">Ville</label>
           <input type="text" id="ville" required>
         </div>
       </div>
+      <div id="distance-info" style="display:none;background:rgba(26,115,200,0.1);border:1px solid rgba(26,115,200,0.3);border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.3rem;font-size:0.85rem;color:var(--blue-light);">🗺️ Distance depuis Lens : <strong id="distance-km"></strong></div>
       <div class="form-row">
         <div class="field">
           <label for="tel">Téléphone</label>
@@ -613,6 +616,13 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     return;
   }
 
+  // Validation code postal
+  const cpVal = (document.getElementById('cp').value || '').trim();
+  if(cpVal && !cpVal.startsWith('59') && !cpVal.startsWith('62')){
+    showToastError('Nous n\'intervenons que dans les départements 59 (Nord) et 62 (Pas-de-Calais). Merci de nous contacter au 07 59 70 54 97 pour toute autre zone.');
+    return;
+  }
+
   // Double sécurité : jour bloqué
   if(isDateBlocked(selectedDate)){
     showToastError('Cette date n\'est plus disponible. Merci de choisir une autre date.');
@@ -727,6 +737,111 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
   }
   updateSubmitState();
 });
+
+// ---------- Autocomplétion adresse ----------
+const LENS_COORDS = { lon: 2.8275, lat: 50.4322 }; // Lens centre
+
+let adresseTimeout = null;
+const adresseInput = document.getElementById('adresse');
+const adresseSuggestionsBox = document.getElementById('adresse-suggestions');
+
+adresseInput.addEventListener('input', () => {
+  clearTimeout(adresseTimeout);
+  const q = adresseInput.value.trim();
+  if(q.length < 3){ adresseSuggestionsBox.style.display = 'none'; return; }
+  adresseTimeout = setTimeout(() => fetchAdresseSuggestions(q), 300);
+});
+
+async function fetchAdresseSuggestions(q){
+  try{
+    const url = `https://data.geopf.fr/geocodage/completion/?text=${encodeURIComponent(q)}&type=StreetAddress&maximumResponses=6&terr=METROPOLE`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = data.results || [];
+    if(!results.length){ adresseSuggestionsBox.style.display = 'none'; return; }
+    adresseSuggestionsBox.innerHTML = results.map((r,i) => `
+      <div class="adresse-item" data-idx="${i}" data-zip="${r.zipcode||''}" data-city="${r.city||''}" data-lat="${r.y||''}" data-lon="${r.x||''}" data-street="${r.street||''}"
+        style="padding:0.55rem 0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.88rem;hover:background:rgba(255,255,255,0.05);">
+        ${r.fulltext || ''}
+      </div>`).join('');
+    adresseSuggestionsBox.style.display = 'block';
+    adresseSuggestionsBox.querySelectorAll('.adresse-item').forEach(el => {
+      el.addEventListener('click', () => {
+        adresseInput.value = el.dataset.street || '';
+        document.getElementById('cp').value   = el.dataset.zip  || '';
+        document.getElementById('ville').value = el.dataset.city || '';
+        adresseSuggestionsBox.style.display = 'none';
+        validateCP(el.dataset.zip);
+        if(el.dataset.lat && el.dataset.lon){
+          fetchDistance(parseFloat(el.dataset.lat), parseFloat(el.dataset.lon));
+        }
+      });
+    });
+  }catch(e){ adresseSuggestionsBox.style.display = 'none'; }
+}
+
+document.addEventListener('click', e => {
+  if(!adresseSuggestionsBox.contains(e.target) && e.target !== adresseInput){
+    adresseSuggestionsBox.style.display = 'none';
+  }
+});
+
+// ---------- Validation CP ----------
+function validateCP(cp){
+  const cpEl = document.getElementById('cp');
+  const errEl = document.getElementById('cp-error');
+  const val = (cp || cpEl.value || '').trim();
+  const valid = val.startsWith('59') || val.startsWith('62');
+  errEl.style.display = val.length >= 2 && !valid ? 'block' : 'none';
+  return valid || val.length < 2;
+}
+
+document.getElementById('cp').addEventListener('input', e => {
+  validateCP(e.target.value);
+  // Si CP complet (5 chiffres) et pas encore d'adresse géocodée, chercher la distance via le CP
+  if(e.target.value.length === 5){
+    fetchDistanceByCP(e.target.value, document.getElementById('ville').value);
+  } else {
+    document.getElementById('distance-info').style.display = 'none';
+  }
+});
+
+// ---------- Distance via IGN ----------
+async function fetchDistance(lat, lon){
+  try{
+    const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&profile=car&optimization=shortest&start=${LENS_COORDS.lon},${LENS_COORDS.lat}&end=${lon},${lat}&geometryFormat=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const distM = data.distance || (data.routes && data.routes[0] && data.routes[0].distance);
+    if(distM){
+      const distKm = (distM / 1000).toFixed(1);
+      document.getElementById('distance-km').textContent = distKm + ' km';
+      document.getElementById('distance-info').style.display = 'block';
+    }
+  }catch(e){
+    // Fallback : distance à vol d'oiseau
+    const R = 6371;
+    const dLat = (lat - LENS_COORDS.lat) * Math.PI / 180;
+    const dLon = (lon - LENS_COORDS.lon) * Math.PI / 180;
+    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(LENS_COORDS.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    const dist = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+    document.getElementById('distance-km').textContent = `~${dist} km (vol d'oiseau)`;
+    document.getElementById('distance-info').style.display = 'block';
+  }
+}
+
+async function fetchDistanceByCP(cp, ville){
+  try{
+    const q = encodeURIComponent(`${cp} ${ville}`);
+    const res = await fetch(`https://data.geopf.fr/geocodage/completion/?text=${q}&type=Municipality&maximumResponses=1`);
+    const data = await res.json();
+    const r = data.results && data.results[0];
+    if(r && r.x && r.y) fetchDistance(parseFloat(r.y), parseFloat(r.x));
+  }catch(e){}
+}
+
+// ---------- Validation CP à la soumission ----------
+const origSubmit = document.getElementById('rdv-form').onsubmit;
 
 // ---------- Init : charger la config PUIS afficher le calendrier ----------
 loadAgendaConfig().then(() => renderDateScroller());
