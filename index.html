@@ -1371,6 +1371,10 @@ document.querySelectorAll('a[href]').forEach(link => {
   if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto') && !href.startsWith('tel')) {
     link.addEventListener('click', function(e) {
       e.preventDefault();
+      if (link.hasAttribute('data-rdv-closed')) {
+        alert(link.getAttribute('data-rdv-closed-msg') || 'Prise de RDV momentanément indisponible.');
+        return;
+      }
       document.getElementById('page-wrapper').style.animation = 'pageOut 0.3s ease forwards';
       setTimeout(() => { window.location.href = href; }, 300);
     });
@@ -1441,15 +1445,13 @@ window.addEventListener('resize', fixHeroPadding);
       }
 
       if(closedNow){
+        const closedMsg = 'La prise de RDV est momentanément indisponible : ' + (texte ? texte.textContent : 'nous sommes fermés') + '.';
         document.querySelectorAll('a[href="/rdv.html"], a[href="rdv.html"]').forEach(a => {
-          a.removeAttribute('href');
+          a.setAttribute('data-rdv-closed', 'true');
+          a.setAttribute('data-rdv-closed-msg', closedMsg);
           a.style.opacity = '0.5';
           a.style.cursor = 'not-allowed';
           a.setAttribute('title', 'Prise de RDV indisponible pendant la fermeture');
-          a.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('La prise de RDV est momentanément indisponible : ' + (texte ? texte.textContent : 'nous sommes fermés') + '.');
-          });
         });
       }
     }
