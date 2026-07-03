@@ -1399,7 +1399,7 @@ window.addEventListener('resize', fixHeroPadding);
       'https://gzrqkapwjwlwkvwtykfi.supabase.co',
       'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
     );
-    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_retour').eq('id',1).single();
+    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_debut,banniere_date_fin').eq('id',1).single();
     if(error || !data) return;
     const set = (id, val, suffix) => {
       const el = document.getElementById(id);
@@ -1422,18 +1422,35 @@ window.addEventListener('resize', fixHeroPadding);
     if(el4) el4.textContent = (data.tarif_irreparable ?? 35) + '€ TTC';
     // Banniere de fermeture
     if(data.banniere_active){
+      const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+      const todayISO = new Date().toISOString().slice(0,10);
+      const debut = data.banniere_date_debut || null;
+      const fin   = data.banniere_date_fin   || null;
+      const closedNow = (!debut || todayISO >= debut) && (!fin || todayISO <= fin);
+
       const banniere = document.getElementById('banniere-fermeture');
       const texte = document.getElementById('banniere-fermeture-texte');
       if(banniere && texte){
-        let msg = data.banniere_message || 'Nous sommes actuellement fermés';
-        if(data.banniere_date_retour){
-          const d = new Date(data.banniere_date_retour + 'T00:00:00');
-          const dateStr = d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
-          msg += ' — Retour le ' + dateStr;
-        }
+        let msg = data.banniere_message || 'Fermeture temporaire';
+        if(debut && fin)      msg += ' — Fermé du ' + fmt(debut) + ' au ' + fmt(fin);
+        else if(fin)          msg += ' — Retour le ' + fmt(fin);
+        else if(debut)        msg += ' — Fermé à partir du ' + fmt(debut);
         texte.textContent = msg;
         banniere.style.display = 'block';
         if(typeof fixHeroPadding === 'function') fixHeroPadding();
+      }
+
+      if(closedNow){
+        document.querySelectorAll('a[href="/rdv.html"], a[href="rdv.html"]').forEach(a => {
+          a.removeAttribute('href');
+          a.style.opacity = '0.5';
+          a.style.cursor = 'not-allowed';
+          a.setAttribute('title', 'Prise de RDV indisponible pendant la fermeture');
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('La prise de RDV est momentanément indisponible : ' + (texte ? texte.textContent : 'nous sommes fermés') + '.');
+          });
+        });
       }
     }
   }catch(e){ console.error('Erreur chargement tarifs :', e); }
