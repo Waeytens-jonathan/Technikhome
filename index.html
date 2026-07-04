@@ -1149,7 +1149,7 @@
         <button class="faq-question" onclick="toggleFaq(this)">
           Combien coûte une réparation ? <span class="faq-arrow">▼</span>
         </button>
-        <div class="faq-answer">Les forfaits vont de 60€ à 70€ TTC selon l'appareil. Ce forfait inclut le déplacement, le diagnostic et la main-d'œuvre. Les pièces détachées sont en supplément.</div>
+        <div class="faq-answer">Les forfaits vont de <span id="prix-min-faq">60€</span> à <span id="prix-max-faq">70€</span> TTC selon l'appareil. Ce forfait inclut le déplacement, le diagnostic et la main-d'œuvre. Les pièces détachées sont en supplément.</div>
       </div>
 
       <div class="faq-item">
@@ -1191,7 +1191,7 @@
         <button class="faq-question" onclick="toggleFaq(this)">
           Qu'est-ce que la réparation au composant ? <span class="faq-arrow">▼</span>
         </button>
-        <div class="faq-answer">Plutôt que de remplacer une carte électronique entière, je répare directement le composant défaillant. C'est moins cher et plus écologique. À partir de 35€ TTC.</div>
+        <div class="faq-answer">Plutôt que de remplacer une carte électronique entière, je répare directement le composant défaillant. C'est moins cher et plus écologique. À partir de <span id="prix-composant-faq">35€</span> TTC.</div>
       </div>
 
       <div class="faq-item">
@@ -1417,11 +1417,19 @@ window.addEventListener('resize', fixHeroPadding);
     setCarte('prix-cuisson', data.tarif_cuisson ?? 60);
     setCarte('prix-lavage',  data.tarif_lavage  ?? 65);
     setCarte('prix-froid',   data.tarif_froid   ?? 70);
+    // Fourchette min/max des forfaits (FAQ générale)
+    const forfaits = [data.tarif_cuisson ?? 60, data.tarif_lavage ?? 65, data.tarif_froid ?? 70];
+    const elMin = document.getElementById('prix-min-faq');
+    const elMax = document.getElementById('prix-max-faq');
+    if(elMin) elMin.textContent = Math.min(...forfaits) + '€';
+    if(elMax) elMax.textContent = Math.max(...forfaits) + '€';
     // Textes inline
     const el2 = document.getElementById('prix-deplacement2');
     if(el2) el2.textContent = (data.tarif_deplacement2 ?? 25) + '€ TTC';
     const el3 = document.getElementById('prix-composant');
     if(el3) el3.textContent = (data.tarif_composant ?? 35) + '€ TTC';
+    const el3b = document.getElementById('prix-composant-faq');
+    if(el3b) el3b.textContent = (data.tarif_composant ?? 35) + '€';
     const el4 = document.getElementById('prix-irreparable');
     if(el4) el4.textContent = (data.tarif_irreparable ?? 35) + '€ TTC';
     // Banniere de fermeture

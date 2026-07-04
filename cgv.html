@@ -66,10 +66,10 @@
   <h2>Article 2 – Prestations</h2>
   <p>Technik-Home propose des interventions de diagnostic et de réparation d'appareils électroménagers, audiovisuels et informatiques à domicile. Les forfaits comprennent le déplacement, le diagnostic complet et la main-d'œuvre (1ère heure).</p>
   <p><strong>Tarifs en vigueur :</strong><br>
-  • Forfait Cuisson / Audiovisuel : 60 € TTC<br>
-  • Forfait Lavage / Séchage : 65 € TTC<br>
-  • Forfait Froid : 70 € TTC<br>
-  • Second déplacement / Pose de pièce : 25 € TTC + prix de la pièce</p>
+  • Forfait Cuisson / Audiovisuel : <span id="cgv-tarif-cuisson">60</span> € TTC<br>
+  • Forfait Lavage / Séchage : <span id="cgv-tarif-lavage">65</span> € TTC<br>
+  • Forfait Froid : <span id="cgv-tarif-froid">70</span> € TTC<br>
+  • Second déplacement / Pose de pièce : <span id="cgv-tarif-deplacement2">25</span> € TTC + prix de la pièce</p>
   <p>Ces tarifs s'entendent hors pièces détachées éventuelles.</p>
 </div>
 
@@ -91,7 +91,7 @@
 
 <div class="card">
   <h2>Article 6 – Irréparabilité</h2>
-  <p>Si l'appareil est déclaré irréparable après diagnostic, une <strong>indemnité forfaitaire de 35 € TTC</strong> sera facturée au titre du déplacement et du diagnostic effectué. Cette somme ne sera <strong>en aucun cas remboursée</strong>.</p>
+  <p>Si l'appareil est déclaré irréparable après diagnostic, une <strong>indemnité forfaitaire de <span id="cgv-tarif-irreparable">35</span> € TTC</strong> sera facturée au titre du déplacement et du diagnostic effectué. Cette somme ne sera <strong>en aucun cas remboursée</strong>.</p>
 </div>
 
 <div class="card">
@@ -102,7 +102,7 @@
 
 <div class="card">
   <h2>Article 8 – Réparation au composant</h2>
-  <p>Technik-Home propose un service de réparation au niveau du composant électronique à partir de <strong>35 € TTC</strong>. Ce service est disponible selon la marque et le modèle de l'appareil. Technik-Home se réserve le droit d'accepter ou de refuser la réparation électronique si elle est jugée impossible.</p>
+  <p>Technik-Home propose un service de réparation au niveau du composant électronique à partir de <strong><span id="cgv-tarif-composant">35</span> € TTC</strong>. Ce service est disponible selon la marque et le modèle de l'appareil. Technik-Home se réserve le droit d'accepter ou de refuser la réparation électronique si elle est jugée impossible.</p>
 </div>
 
 <div class="card">
@@ -124,5 +124,26 @@
 <footer>
   © 2025 Technik-Home · <a href="/mentions-legales.html">Mentions légales</a> · <a href="/cgv.html">CGV</a>
 </footer>
+<!-- Chargement dynamique des tarifs depuis Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function(){
+  try{
+    const sb = window.supabase.createClient(
+      'https://gzrqkapwjwlwkvwtykfi.supabase.co',
+      'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
+    );
+    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable').eq('id',1).single();
+    if(error || !data) return;
+    const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    set('cgv-tarif-cuisson',      data.tarif_cuisson      ?? 60);
+    set('cgv-tarif-lavage',       data.tarif_lavage       ?? 65);
+    set('cgv-tarif-froid',        data.tarif_froid        ?? 70);
+    set('cgv-tarif-deplacement2', data.tarif_deplacement2 ?? 25);
+    set('cgv-tarif-composant',    data.tarif_composant    ?? 35);
+    set('cgv-tarif-irreparable',  data.tarif_irreparable  ?? 35);
+  }catch(e){ console.error('Erreur chargement tarifs CGV :', e); }
+})();
+</script>
 </body>
 </html>
