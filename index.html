@@ -779,9 +779,9 @@
 <section class="avis-section">
   <div class="avis-header">
     <div class="avis-note-globale">
-      <span>5.0</span>
+      <span id="avis-note-globale-val">5.0</span>
       <div>
-        <div class="avis-stars">★★★★★</div>
+        <div class="avis-stars" id="avis-note-globale-stars">★★★★★</div>
         <small>Avis Google</small>
       </div>
     </div>
@@ -789,7 +789,7 @@
     <p style="color:var(--gray);font-size:0.95rem;margin-top:0.5rem;">Chez Technik-Home, on vise aussi les étoiles. ⭐</p>
   </div>
 
-  <div class="avis-grid">
+  <div class="avis-grid" id="avis-grid-container">
 
     <div class="avis-card">
       <div class="avis-card-header">
@@ -1403,7 +1403,7 @@ window.addEventListener('resize', fixHeroPadding);
       'https://gzrqkapwjwlwkvwtykfi.supabase.co',
       'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
     );
-    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_debut,banniere_date_fin').eq('id',1).single();
+    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_debut,banniere_date_fin,avis_note_globale,avis_liste').eq('id',1).single();
     if(error || !data) return;
     const set = (id, val, suffix) => {
       const el = document.getElementById(id);
@@ -1461,6 +1461,37 @@ window.addEventListener('resize', fixHeroPadding);
           a.style.cursor = 'not-allowed';
           a.setAttribute('title', 'Prise de RDV indisponible pendant la fermeture');
         });
+      }
+    }
+    // Avis clients
+    const noteGlobale = parseFloat(data.avis_note_globale) || 5.0;
+    const starsStr = (n) => {
+      const full = Math.round(n);
+      return '★'.repeat(Math.max(0, Math.min(5, full))) + '☆'.repeat(Math.max(0, 5 - full));
+    };
+    const elNoteVal = document.getElementById('avis-note-globale-val');
+    const elNoteStars = document.getElementById('avis-note-globale-stars');
+    if(elNoteVal) elNoteVal.textContent = noteGlobale.toFixed(1);
+    if(elNoteStars) elNoteStars.textContent = starsStr(noteGlobale);
+
+    let avisListe = [];
+    try{ avisListe = data.avis_liste ? JSON.parse(data.avis_liste) : []; }catch(e){ avisListe = []; }
+    if(avisListe.length){
+      const grid = document.getElementById('avis-grid-container');
+      if(grid){
+        grid.innerHTML = avisListe.slice(0,8).map(a => {
+          const nom = a.nom || 'Client';
+          const initiale = nom.trim().charAt(0).toUpperCase() || '?';
+          const note = parseInt(a.note) || 5;
+          return `<div class="avis-card">
+            <div class="avis-card-header">
+              <div class="avis-avatar">${initiale}</div>
+              <div><div class="avis-name">${nom}</div><div class="avis-date">${a.date || ''}</div></div>
+            </div>
+            <div class="avis-stars">${starsStr(note)}</div>
+            <p class="avis-text">${a.texte || ''}</p>
+          </div>`;
+        }).join('');
       }
     }
   }catch(e){ console.error('Erreur chargement tarifs :', e); }
