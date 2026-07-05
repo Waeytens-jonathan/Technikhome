@@ -865,6 +865,10 @@
 
   </div>
 
+  <div id="alerte-faux-avis" style="display:none;max-width:700px;margin:0 auto 1.5rem;background:rgba(245,166,35,0.08);border:1px solid var(--orange);border-radius:12px;padding:1rem 1.4rem;text-align:center;">
+    <p id="alerte-faux-avis-texte" style="color:var(--white);font-size:0.88rem;line-height:1.6;margin:0;"></p>
+  </div>
+
   <div class="avis-btn-wrap">
     <a href="https://share.google/NxKqULgK5U0cRRcd4" target="_blank" class="avis-btn">
       ⭐ Voir tous les avis sur Google
@@ -1403,7 +1407,7 @@ window.addEventListener('resize', fixHeroPadding);
       'https://gzrqkapwjwlwkvwtykfi.supabase.co',
       'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt'
     );
-    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_debut,banniere_date_fin,avis_note_globale,avis_liste').eq('id',1).single();
+    const { data, error } = await sb.from('agenda_config').select('tarif_cuisson,tarif_lavage,tarif_froid,tarif_deplacement2,tarif_composant,tarif_irreparable,banniere_active,banniere_message,banniere_date_debut,banniere_date_fin,avis_note_globale,avis_liste,alerte_faux_avis_active,alerte_faux_avis_texte').eq('id',1).single();
     if(error || !data) return;
     const set = (id, val, suffix) => {
       const el = document.getElementById(id);
@@ -1492,6 +1496,15 @@ window.addEventListener('resize', fixHeroPadding);
             <p class="avis-text">${a.texte || ''}</p>
           </div>`;
         }).join('');
+      }
+    }
+    // Alerte faux avis
+    if(data.alerte_faux_avis_active && data.alerte_faux_avis_texte){
+      const boxAlerte = document.getElementById('alerte-faux-avis');
+      const texteAlerte = document.getElementById('alerte-faux-avis-texte');
+      if(boxAlerte && texteAlerte){
+        texteAlerte.textContent = data.alerte_faux_avis_texte;
+        boxAlerte.style.display = 'block';
       }
     }
   }catch(e){ console.error('Erreur chargement tarifs :', e); }
