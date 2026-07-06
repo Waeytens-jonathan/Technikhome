@@ -152,6 +152,41 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+// Recule de `hoursToSubtract` heures ouvrées (lun-sam, 10h-18h) à partir de endDate
+function subtractBusinessHours(endDate, hoursToSubtract){
+  let remaining = hoursToSubtract;
+  let cursor = new Date(endDate);
+  let safety = 0;
+  while(remaining > 0 && safety < 500){
+    safety++;
+    const dayOfWeek = cursor.getDay();
+    const dayStart = new Date(cursor); dayStart.setHours(10,0,0,0);
+    if(dayOfWeek === 0 || cursor <= dayStart){
+      // Dimanche, ou avant l'ouverture : on saute à la fin de la journée ouvrée précédente
+      cursor.setDate(cursor.getDate() - 1);
+      cursor.setHours(18,0,0,0);
+      continue;
+    }
+    const availableInDay = (cursor - dayStart) / 3600000;
+    if(availableInDay >= remaining){
+      cursor = new Date(cursor.getTime() - remaining * 3600000);
+      remaining = 0;
+    } else {
+      remaining -= availableInDay;
+      cursor = new Date(dayStart);
+    }
+  }
+  return cursor;
+}
+
+function getCancelPolicyInfo(dateISO, creneau){
+  const rdvStart = new Date(dateISO + 'T00:00:00');
+  rdvStart.setHours(creneau === 'matin' ? 10 : 12, 0, 0, 0);
+  const deadline = subtractBusinessHours(rdvStart, 24);
+  const isLate = new Date() > deadline;
+  return { isLate };
+}
+
 async function init(){
   const params = new URLSearchParams(window.location.search);
   const appId = params.get('id');
@@ -179,6 +214,16 @@ async function init(){
       return;
     }
 
+    const { isLate } = getCancelPolicyInfo(data.date, data.creneau);
+    const policyBox = isLate
+      ? `<div style="background:rgba(255,107,107,0.08);border-left:3px solid var(--red);border-radius:8px;padding:0.8rem 1rem;margin-top:1rem;font-size:0.85rem;color:var(--white);">
+           <strong>⚠️ Annulation tardive</strong><br>
+           Ce rendez-vous est à moins de 24 heures ouvrées. Conformément à nos <a href="/cgv.html" target="_blank" style="color:var(--orange);">CGV</a>, une indemnité pouvant atteindre 50 % du montant estimé de l'intervention pourra vous être demandée.
+         </div>`
+      : `<div style="background:rgba(74,222,128,0.08);border-left:3px solid #4ade80;border-radius:8px;padding:0.8rem 1rem;margin-top:1rem;font-size:0.85rem;color:var(--white);">
+           ✅ Vous annulez dans les délais : aucun frais ne sera appliqué.
+         </div>`;
+
     content.innerHTML = `
       <h1>Annuler mon rendez-vous</h1>
       <div class="detail-row">
@@ -193,10 +238,15 @@ async function init(){
         <div class="detail-label">Intervention</div>
         <div class="detail-value">${escapeHtml(data.appareil || '')}</div>
       </div>
+      ${policyBox}
       <button class="btn-cancel" id="confirm-cancel-btn">🚫 Confirmer l'annulation</button>
     `;
 
     document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+      if(isLate){
+        const ok = confirm("Ce rendez-vous est à moins de 24 heures ouvrées. Une indemnité pouvant atteindre 50 % du montant de l'intervention pourra vous être demandée. Confirmer l'annulation ?");
+        if(!ok) return;
+      }
       const btn = document.getElementById('confirm-cancel-btn');
       btn.disabled = true;
       btn.textContent = 'Annulation en cours…';
