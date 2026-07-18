@@ -1146,7 +1146,7 @@
         <button class="faq-question" onclick="toggleFaq(this)">
           Intervenez-vous à domicile ? <span class="faq-arrow">▼</span>
         </button>
-        <div class="faq-answer">Oui, j'interviens directement chez vous dans les secteurs 59 et 62 sans que vous ayez à déplacer votre appareil. Dans un rayon de 30km autour de Lens, au-delà des 30km un supplément peut être appliqué à hauteur de 2€ du kilomètre.</div>
+        <div class="faq-answer">Oui, j'interviens directement chez vous dans les secteurs 59 et 62, sans que vous ayez à déplacer votre appareil.</div>
       </div>
 
       <div class="faq-item">
@@ -1480,6 +1480,27 @@ window.addEventListener('resize', fixHeroPadding);
 
     let avisListe = [];
     try{ avisListe = data.avis_liste ? JSON.parse(data.avis_liste) : []; }catch(e){ avisListe = []; }
+
+    function pluralUniteSite(n, unite){
+      if(unite === 'mois') return 'mois';
+      if(unite === 'an') return n > 1 ? 'ans' : 'an';
+      if(unite === 'semaine') return n > 1 ? 'semaines' : 'semaine';
+      return n > 1 ? 'jours' : 'jour';
+    }
+    function texteDateAvis(a){
+      if(a.dateReference){
+        const d = new Date(a.dateReference + 'T00:00:00');
+        const joursEcoules = Math.max(0, Math.round((new Date() - d) / 86400000));
+        let n, unite;
+        if(joursEcoules < 7){ n = Math.max(joursEcoules,1); unite = 'jour'; }
+        else if(joursEcoules < 30){ n = Math.round(joursEcoules/7); unite = 'semaine'; }
+        else if(joursEcoules < 365){ n = Math.round(joursEcoules/30); unite = 'mois'; }
+        else { n = Math.round(joursEcoules/365); unite = 'an'; }
+        return `Il y a ${n} ${pluralUniteSite(n, unite)}`;
+      }
+      return a.date || ''; // repli pour les anciens avis pas encore resauvegardés
+    }
+
     if(avisListe.length){
       const grid = document.getElementById('avis-grid-container');
       if(grid){
@@ -1490,7 +1511,7 @@ window.addEventListener('resize', fixHeroPadding);
           return `<div class="avis-card">
             <div class="avis-card-header">
               <div class="avis-avatar">${initiale}</div>
-              <div><div class="avis-name">${nom}</div><div class="avis-date">${a.date || ''}</div></div>
+              <div><div class="avis-name">${nom}</div><div class="avis-date">${texteDateAvis(a)}</div></div>
             </div>
             <div class="avis-stars">${starsStr(note)}</div>
             <p class="avis-text">${a.texte || ''}</p>
