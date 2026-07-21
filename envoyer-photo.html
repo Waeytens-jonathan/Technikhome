@@ -51,9 +51,17 @@
     <div id="content">
       <h1>📷 Photo de la plaque signalétique</h1>
       <p class="sub">Prenez une photo ou choisissez-la dans votre galerie — elle apparaîtra automatiquement sur votre réservation en cours.</p>
-      <label class="upload-btn" for="photo-input">Prendre / choisir une photo</label>
-      <input type="file" id="photo-input" accept="image/*" capture="environment">
+
+      <div id="choice-buttons">
+        <label class="upload-btn" for="photo-camera-input">📷 Prendre une photo</label>
+        <input type="file" id="photo-camera-input" accept="image/*" capture="environment">
+
+        <label class="upload-btn" for="photo-gallery-input" style="background:var(--card-bg);border:1px solid var(--orange);color:var(--white);">🖼️ Choisir dans la galerie</label>
+        <input type="file" id="photo-gallery-input" accept="image/*">
+      </div>
+
       <img id="preview" alt="Aperçu">
+      <button id="delete-btn" style="display:none;width:100%;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:12px;padding:0.8rem;font-size:0.9rem;cursor:pointer;margin-top:0.6rem;">🗑️ Supprimer et reprendre</button>
       <div id="status"></div>
     </div>
   </div>
@@ -100,7 +108,10 @@ function resizeImage(file, maxDim = 1200, quality = 0.75){
   });
 }
 
-document.getElementById('photo-input')?.addEventListener('change', async (e) => {
+document.getElementById('photo-camera-input')?.addEventListener('change', (e) => handlePhotoSelected(e));
+document.getElementById('photo-gallery-input')?.addEventListener('change', (e) => handlePhotoSelected(e));
+
+async function handlePhotoSelected(e){
   const file = e.target.files[0];
   if(!file || !code) return;
 
@@ -111,16 +122,33 @@ document.getElementById('photo-input')?.addEventListener('change', async (e) => 
     const dataUrl = await resizeImage(file);
     document.getElementById('preview').src = dataUrl;
     document.getElementById('preview').style.display = 'block';
+    document.getElementById('choice-buttons').style.display = 'none';
+    document.getElementById('delete-btn').style.display = 'block';
 
     const { error } = await sb.from('plaque_photos_temp').upsert({ code, photo_base64: dataUrl }, { onConflict: 'code' });
     if(error) throw error;
 
     statusEl.innerHTML = '<div class="state-message success">✅ Photo envoyée ! Elle est déjà visible sur votre réservation, vous pouvez fermer cette page.</div>';
-    document.querySelector('.upload-btn').textContent = 'Reprendre une autre photo';
   }catch(err){
     console.error(err);
     statusEl.innerHTML = '<div class="state-message error">Une erreur est survenue, merci de réessayer.</div>';
   }
+}
+
+document.getElementById('delete-btn')?.addEventListener('click', async () => {
+  if(!code) return;
+  const statusEl = document.getElementById('status');
+  try{
+    await sb.from('plaque_photos_temp').delete().eq('code', code);
+  }catch(err){ console.error('Erreur suppression :', err); }
+
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('preview').src = '';
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('choice-buttons').style.display = 'block';
+  document.getElementById('photo-camera-input').value = '';
+  document.getElementById('photo-gallery-input').value = '';
+  statusEl.innerHTML = '';
 });
 </script>
 </body>
