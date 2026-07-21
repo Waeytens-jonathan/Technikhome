@@ -799,6 +799,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     submitBtn.style.display = 'none';
     renderDateScroller();
     document.getElementById('form-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { window.location.href = '/'; }, 4000);
   }catch(e){
     console.error('Erreur envoi RDV :', e);
     showToastError('Impossible d\'envoyer votre demande. Appelez-nous au 07 59 70 54 97.');
