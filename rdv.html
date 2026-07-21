@@ -351,7 +351,8 @@
         <label>Photo de la plaque signalétique <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
         <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.9rem;">Nous aide à préparer la bonne pièce avant notre passage.</p>
 
-        <div id="plaque-choice-buttons" style="display:flex;flex-direction:column;gap:0.6rem;">
+        <!-- Affiché sur PC : choix entre PC et téléphone (avec QR code) -->
+        <div id="plaque-choice-buttons" style="display:none;flex-direction:column;gap:0.6rem;">
           <label for="plaque-file-input" style="display:block;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;font-size:0.9rem;cursor:pointer;text-align:center;">
             💻 J'ai la photo sur mon PC
           </label>
@@ -360,6 +361,19 @@
           <button type="button" id="plaque-open-qr-btn" style="display:block;background:var(--card-bg);border:1px solid var(--orange);color:var(--white);border-radius:10px;padding:0.8rem 1rem;font-size:0.9rem;cursor:pointer;text-align:center;width:100%;">
             📱 J'ai la photo sur mon téléphone
           </button>
+        </div>
+
+        <!-- Affiché sur mobile : ajout direct, pas de QR code (inutile sur son propre téléphone) -->
+        <div id="plaque-direct-buttons" style="display:none;flex-direction:column;gap:0.6rem;">
+          <label for="plaque-camera-input" style="display:block;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;font-size:0.9rem;cursor:pointer;text-align:center;">
+            📷 Prendre une photo
+          </label>
+          <input type="file" id="plaque-camera-input" accept="image/*" capture="environment" style="display:none;">
+
+          <label for="plaque-gallery-input" style="display:block;background:var(--card-bg);border:1px solid var(--orange);color:var(--white);border-radius:10px;padding:0.8rem 1rem;font-size:0.9rem;cursor:pointer;text-align:center;">
+            🖼️ Choisir dans la galerie
+          </label>
+          <input type="file" id="plaque-gallery-input" accept="image/*" style="display:none;">
         </div>
 
         <div id="plaque-result" style="display:none;">
@@ -868,6 +882,13 @@ let plaquePhotoDataUrl = null;
 const plaqueCode = 'PLQ' + Date.now() + Math.random().toString(36).slice(2, 8);
 let plaquePollInterval = null;
 
+const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if(isMobileDevice){
+  document.getElementById('plaque-direct-buttons').style.display = 'flex';
+} else {
+  document.getElementById('plaque-choice-buttons').style.display = 'flex';
+}
+
 function resizeImage(file, maxDim = 1200, quality = 0.75){
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -901,8 +922,10 @@ function showPlaquePreview(dataUrl){
   plaquePhotoDataUrl = dataUrl;
   document.getElementById('plaque-preview').src = dataUrl;
   document.getElementById('plaque-choice-buttons').style.display = 'none';
+  document.getElementById('plaque-direct-buttons').style.display = 'none';
   document.getElementById('plaque-result').style.display = 'block';
-  document.getElementById('plaque-qr-modal').style.display = 'none';
+  const qrModal = document.getElementById('plaque-qr-modal');
+  if(qrModal) qrModal.style.display = 'none';
   if(plaquePollInterval){ clearInterval(plaquePollInterval); plaquePollInterval = null; }
 }
 
@@ -914,6 +937,17 @@ document.getElementById('plaque-file-input')?.addEventListener('change', async (
     showPlaquePreview(dataUrl);
   }catch(err){ console.error('Erreur lecture photo :', err); }
 });
+
+async function handleDirectPlaqueInput(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const dataUrl = await resizeImage(file);
+    showPlaquePreview(dataUrl);
+  }catch(err){ console.error('Erreur lecture photo :', err); }
+}
+document.getElementById('plaque-camera-input')?.addEventListener('change', handleDirectPlaqueInput);
+document.getElementById('plaque-gallery-input')?.addEventListener('change', handleDirectPlaqueInput);
 
 function renderPlaqueQrCode(){
   const qrEl = document.getElementById('plaque-qrcode');
@@ -951,8 +985,16 @@ document.getElementById('plaque-delete-btn')?.addEventListener('click', async ()
   plaquePhotoDataUrl = null;
   document.getElementById('plaque-preview').src = '';
   document.getElementById('plaque-result').style.display = 'none';
-  document.getElementById('plaque-choice-buttons').style.display = 'flex';
+  if(isMobileDevice){
+    document.getElementById('plaque-direct-buttons').style.display = 'flex';
+  } else {
+    document.getElementById('plaque-choice-buttons').style.display = 'flex';
+  }
   document.getElementById('plaque-file-input').value = '';
+  const camInput = document.getElementById('plaque-camera-input');
+  const galInput = document.getElementById('plaque-gallery-input');
+  if(camInput) camInput.value = '';
+  if(galInput) galInput.value = '';
   try{ await sb.from('plaque_photos_temp').delete().eq('code', plaqueCode); }catch(e){ /* rien à supprimer, pas grave */ }
 });
 
