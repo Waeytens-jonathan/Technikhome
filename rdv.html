@@ -11,7 +11,6 @@
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
   :root {
     --navy: #0d1b2a;
@@ -915,13 +914,10 @@ document.getElementById('plaque-file-input')?.addEventListener('change', async (
 
 function initPlaqueQrCode(){
   const qrEl = document.getElementById('plaque-qrcode');
-  if(!qrEl || typeof QRCode === 'undefined') return;
+  if(!qrEl) return;
   const url = `https://technikhome.fr/envoyer-photo.html?code=${plaqueCode}`;
-  QRCode.toCanvas(url, { width: 160, margin: 1 }, (err, canvas) => {
-    if(err){ console.error('Erreur génération QR code :', err); return; }
-    qrEl.innerHTML = '';
-    qrEl.appendChild(canvas);
-  });
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}`;
+  qrEl.innerHTML = `<img src="${qrImgUrl}" width="160" height="160" alt="QR code" style="display:block;" onerror="this.parentElement.innerHTML='<div style=&quot;color:#333;font-size:0.8rem;padding:0.5rem;max-width:160px;&quot;>QR code indisponible. Utilisez le bouton d\\'import ci-dessus depuis votre téléphone.</div>'">`;
 
   plaquePollInterval = setInterval(async () => {
     if(plaquePhotoDataUrl) return; // déjà reçue via import classique
