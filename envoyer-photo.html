@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Envoyer la photo de la plaque – Technik-Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --orange: #f5a623;
+    --white: #f8f9fb;
+    --gray: #8a97a8;
+    --card-bg: #162233;
+    --border: rgba(255,255,255,0.07);
+    --green: #4ade80;
+    --red: #ff6b6b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  main { max-width: 420px; width: 100%; }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.05em;
+    text-align: center; margin-bottom: 1.6rem; display: block; color: var(--white); text-decoration: none;
+  }
+  .logo span { color: var(--orange); }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem; text-align: center; }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.02em; margin-bottom: 0.6rem; }
+  p.sub { color: var(--gray); font-size: 0.88rem; margin-bottom: 1.4rem; }
+  .upload-btn {
+    display: block; width: 100%; background: var(--orange); color: #1a1206; border: none; border-radius: 12px;
+    padding: 1.1rem; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 0.8rem;
+  }
+  input[type="file"] { display: none; }
+  #preview { max-width: 100%; border-radius: 10px; margin: 1rem 0; display: none; }
+  .state-message { color: var(--gray); padding: 1rem 0; font-size: 0.9rem; }
+  .state-message.success { color: var(--green); }
+  .state-message.error { color: var(--red); }
+</style>
+</head>
+<body>
+<main>
+  <a href="/" class="logo">TECHNIK<span>-HOME</span></a>
+  <div class="card">
+    <div id="content">
+      <h1>📷 Photo de la plaque signalétique</h1>
+      <p class="sub">Prenez une photo ou choisissez-la dans votre galerie — elle apparaîtra automatiquement sur votre réservation en cours.</p>
+      <label class="upload-btn" for="photo-input">Prendre / choisir une photo</label>
+      <input type="file" id="photo-input" accept="image/*" capture="environment">
+      <img id="preview" alt="Aperçu">
+      <div id="status"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://gzrqkapwjwlwkvwtykfi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EKs2eR3Du9MYSnUgeTFtBQ_vnOOFqHt';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const code = params.get('code');
+
+if(!code){
+  document.getElementById('content').innerHTML = '<div class="state-message error">Lien invalide. Retournez sur la page de réservation et réessayez.</div>';
+}
+
+function resizeImage(file, maxDim = 1200, quality = 0.75){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.onload = () => {
+        let { width, height } = img;
+        if(width > height && width > maxDim){
+          height = Math.round(height * (maxDim / width));
+          width = maxDim;
+        } else if(height > maxDim){
+          width = Math.round(width * (maxDim / height));
+          height = maxDim;
+        }
+        const canvasEl = document.createElement('canvas');
+        canvasEl.width = width;
+        canvasEl.height = height;
+        const cctx = canvasEl.getContext('2d');
+        cctx.drawImage(img, 0, 0, width, height);
+        resolve(canvasEl.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('photo-input')?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file || !code) return;
+
+  const statusEl = document.getElementById('status');
+  statusEl.innerHTML = '<div class="state-message">Envoi en cours…</div>';
+
+  try{
+    const dataUrl = await resizeImage(file);
+    document.getElementById('preview').src = dataUrl;
+    document.getElementById('preview').style.display = 'block';
+
+    const { error } = await sb.from('plaque_photos_temp').upsert({ code, photo_base64: dataUrl }, { onConflict: 'code' });
+    if(error) throw error;
+
+    statusEl.innerHTML = '<div class="state-message success">✅ Photo envoyée ! Elle est déjà visible sur votre réservation, vous pouvez fermer cette page.</div>';
+    document.querySelector('.upload-btn').textContent = 'Reprendre une autre photo';
+  }catch(err){
+    console.error(err);
+    statusEl.innerHTML = '<div class="state-message error">Une erreur est survenue, merci de réessayer.</div>';
+  }
+});
+</script>
+</body>
+</html>
