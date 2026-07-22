@@ -421,6 +421,15 @@
     <div id="form-success">
       <div>✅ Votre rendez-vous est confirmé !</div>
       <div style="font-weight:400;font-size:0.85rem;margin-top:0.5rem;color:var(--white);">Le technicien vous contactera par SMS pour annoncer son arrivée quelques minutes avant l'intervention.</div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;margin-top:1.2rem;">
+        <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"></circle>
+          <circle id="redirect-progress-circle" cx="24" cy="24" r="20" fill="none" stroke="var(--orange)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear;"></circle>
+        </svg>
+        <div style="font-size:0.8rem;color:var(--gray);">Retour à l'accueil dans <span id="redirect-countdown">4</span>s…</div>
+      </div>
+
       <a href="/" class="form-submit" style="text-decoration:none;margin:1rem auto 0;max-width:260px;">← Retour au site</a>
     </div>
     <div id="form-error">⚠️ Une erreur est survenue. Merci de réessayer ou de nous appeler directement.</div>
@@ -799,7 +808,20 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     submitBtn.style.display = 'none';
     renderDateScroller();
     document.getElementById('form-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => { window.location.href = '/'; }, 4000);
+    const totalSeconds = 4;
+    const circle = document.getElementById('redirect-progress-circle');
+    const countdownEl = document.getElementById('redirect-countdown');
+    const circumference = 125.6;
+    let secondsLeft = totalSeconds;
+    const countdownInterval = setInterval(() => {
+      secondsLeft--;
+      if(countdownEl) countdownEl.textContent = Math.max(secondsLeft, 0);
+      if(circle) circle.style.strokeDashoffset = String(circumference * (totalSeconds - secondsLeft) / totalSeconds);
+      if(secondsLeft <= 0){
+        clearInterval(countdownInterval);
+        window.location.href = '/';
+      }
+    }, 1000);
   }catch(e){
     console.error('Erreur envoi RDV :', e);
     showToastError('Impossible d\'envoyer votre demande. Appelez-nous au 07 59 70 54 97.');
