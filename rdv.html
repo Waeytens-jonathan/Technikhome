@@ -316,6 +316,10 @@
           <input type="email" id="email" placeholder="votre@email.fr" autocomplete="email">
         </div>
       </div>
+      <div class="field">
+        <label for="tel-interlocuteur">Autre numéro pour le jour du RDV <span style="font-size:0.8rem;font-weight:400;opacity:0.7;">(optionnel — si ce n'est pas vous qui accueillerez le technicien)</span></label>
+        <input type="tel" id="tel-interlocuteur" placeholder="Ex : numéro d'un proche présent sur place" autocomplete="off">
+      </div>
     </div>
 
     <div class="card">
@@ -729,6 +733,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     cp: document.getElementById('cp').value.trim(),
     ville: document.getElementById('ville').value.trim(),
     tel: document.getElementById('tel').value.trim(),
+    tel_interlocuteur: document.getElementById('tel-interlocuteur').value.trim() || null,
     email: document.getElementById('email').value.trim(),
     appareil: document.getElementById('appareil').value,
     marque: document.getElementById('marque').value.trim() || null,
