@@ -422,6 +422,22 @@
   }
   .tarif-extra p { color: var(--gray); font-size: 0.88rem; }
 
+  .tarif-souscat-toggle {
+    display: flex; justify-content: center; gap: 0.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 5px; margin: 1.5rem auto 2rem; max-width: fit-content;
+  }
+  .tarif-souscat-btn {
+    padding: 0.55rem 1.2rem; border-radius: 100px;
+    border: none; background: transparent; color: var(--gray);
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s; white-space: nowrap;
+  }
+  .tarif-souscat-btn.active { background: var(--orange); color: #fff; }
+  .tarif-souscat-btn:not(.active):hover { background: rgba(255,255,255,0.08); color: var(--white); }
+
   /* ─── POURQUOI ─── */
   .why-grid {
     display: grid;
@@ -747,8 +763,8 @@
   <div class="hero-grid" style="grid-template-columns:1fr;text-align:center;">
     <div>
       <div class="hero-badge">Intervention sous 48h • Secteurs 59 / 62</div>
-      <h1>Réparation<br><em>Électroménager</em><br>à domicile</h1>
-      <p class="hero-sub">Diagnostic transparent, main-d'œuvre incluse, toutes marques. On se déplace chez vous dans le Nord et le Pas-de-Calais.</p>
+      <h1>Réparation<br><em>Électroménager</em><br>à domicile<br><span style="font-size:0.5em;font-weight:400;display:block;">et en atelier</span></h1>
+      <p class="hero-sub">Diagnostic transparent, main-d'œuvre incluse, toutes marques. Gros électroménager : on se déplace chez vous dans le Nord et le Pas-de-Calais. Petit électroménager : dépôt et retrait en atelier.</p>
       <div class="hero-btns" style="justify-content:center;">
         <a href="/rdv.html" class="btn-primary" style="background:var(--orange);">📅 Prendre RDV</a>
         <a href="#contact" class="btn-primary">📬 Nous contacter</a>
@@ -925,6 +941,12 @@
     <h2>Tarifs Transparents</h2>
     <p class="section-desc"><strong style="color:var(--orange);">Forfaits tout compris :</strong><br>déplacement (59/62), diagnostic et main-d'œuvre.<br>Hors pièces détachées.</p>
 
+    <div class="tarif-souscat-toggle" role="tablist">
+      <button type="button" class="tarif-souscat-btn active" id="btn-tarifs-gros" onclick="showTarifSousCat('gros')">🏠 Gros électroménager</button>
+      <button type="button" class="tarif-souscat-btn" id="btn-tarifs-petit" onclick="showTarifSousCat('petit')">☕ Petit électroménager</button>
+    </div>
+
+    <div id="tarifs-gros">
     <div class="tarifs-grid">
       <!-- Cuisson / Audiovisuel -->
       <div class="tarif-card" id="tarif-cuisson" onclick="selectTarif('cuisson')" style="cursor:pointer;">
@@ -985,6 +1007,32 @@
       <div style="font-size:0.85rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;">🔬 Réparation au composant</div>
       <p style="color:var(--white);font-size:0.95rem;margin-bottom:.5rem;">Technik-Home répare vos cartes électroniques en remplaçant les composants défectueux, là où d'autres remplacent la carte entière. À partir de <strong id="prix-composant">35€ TTC</strong>.</p>
       <p style="color:var(--gray);font-size:0.78rem;font-style:italic;">Service disponible selon la marque et le modèle de l'appareil. Technik-Home se réserve le droit d'accepter ou de refuser la réparation électronique si elle est jugée impossible.</p>
+    </div>
+    </div>
+
+    <div id="tarifs-petit" style="display:none;">
+      <div class="tarifs-grid" style="grid-template-columns:1fr;max-width:480px;margin:0 auto;">
+        <div class="tarif-card featured">
+          <div class="tarif-icon">☕</div>
+          <div class="tarif-name">Diagnostic Petit Électroménager</div>
+          <div class="tarif-price" id="prix-petit-electro">35<span>€ TTC</span></div>
+          <p class="tarif-note">Hors coût des pièces détachées éventuelles</p>
+          <ul class="tarif-features">
+            <li>Diagnostic complet en atelier</li>
+            <li>Devis avant toute réparation</li>
+            <li>Aspirateur &middot; Robot cuiseur &middot; Cafetière &middot; Petit électroménager</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tarif-extra">
+        <div class="tarif-extra-title">🕐 Horaires de dépôt / retrait</div>
+        <p><strong style="color:var(--white);">Tous les jours de 17h à 19h</strong><br>Sur appel préalable obligatoire pour être sûr(e) d'être reçu(e).</p>
+      </div>
+
+      <div style="text-align:center;margin-top:1.5rem;">
+        <a href="tel:0759705497" style="display:inline-block;background:var(--orange);color:#fff;text-align:center;padding:0.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.95rem;">📞 Appeler pour convenir d'un dépôt</a>
+      </div>
     </div>
 
   </div>
@@ -1254,6 +1302,13 @@ function toggleFaq(btn) {
   const isOpen = item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
   if (!isOpen) item.classList.add('open');
+}
+
+function showTarifSousCat(mode) {
+  document.getElementById('tarifs-gros').style.display = mode === 'gros' ? 'block' : 'none';
+  document.getElementById('tarifs-petit').style.display = mode === 'petit' ? 'block' : 'none';
+  document.getElementById('btn-tarifs-gros').classList.toggle('active', mode === 'gros');
+  document.getElementById('btn-tarifs-petit').classList.toggle('active', mode === 'petit');
 }
 
 function selectTarif(type) {
