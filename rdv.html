@@ -353,7 +353,7 @@
 
       <div class="field">
         <label>Photo de la plaque signalétique <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
-        <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.9rem;">Nous aide à préparer la bonne pièce avant notre passage. <a href="/plaque-signaletique.html" target="_blank" style="color:var(--orange);text-decoration:underline;">Où la trouver ?</a></p>
+        <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.9rem;">Nous aide à préparer la bonne pièce avant notre passage. <button type="button" id="ouvrir-astuces-plaque-btn" style="background:none;border:none;padding:0;color:var(--orange);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;">Où la trouver ?</button></p>
 
         <!-- Affiché sur PC : choix entre PC et téléphone (avec QR code) -->
         <div id="plaque-choice-buttons" style="display:none;flex-direction:column;gap:0.6rem;">
@@ -1009,6 +1009,18 @@ document.getElementById('plaque-qr-close-btn')?.addEventListener('click', () => 
   document.getElementById('plaque-qr-modal').style.display = 'none';
 });
 
+document.getElementById('ouvrir-astuces-plaque-btn')?.addEventListener('click', () => {
+  document.getElementById('astuces-plaque-modal').style.display = 'flex';
+});
+
+document.getElementById('astuces-plaque-close-btn')?.addEventListener('click', () => {
+  document.getElementById('astuces-plaque-modal').style.display = 'none';
+});
+
+document.getElementById('astuces-plaque-modal')?.addEventListener('click', (e) => {
+  if(e.target.id === 'astuces-plaque-modal') e.target.style.display = 'none';
+});
+
 document.getElementById('plaque-delete-btn')?.addEventListener('click', async () => {
   plaquePhotoDataUrl = null;
   document.getElementById('plaque-preview').src = '';
@@ -1038,6 +1050,41 @@ loadAgendaConfig().then(() => renderDateScroller());
     <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">Ouvrez l'appareil photo de votre téléphone et visez ce code — la photo apparaîtra ici automatiquement.</p>
     <div id="plaque-qrcode" style="background:#fff;padding:0.8rem;border-radius:10px;display:inline-block;"></div>
     <p id="plaque-qr-status" style="font-size:0.85rem;color:var(--gray);margin-top:1rem;">En attente d'une photo…</p>
+  </div>
+</div>
+
+<div id="astuces-plaque-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:1.2rem;overflow-y:auto;">
+  <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1.6rem;max-width:460px;width:100%;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.02em;margin:0;color:var(--orange);">Où trouver la plaque signalétique ?</h3>
+      <button type="button" id="astuces-plaque-close-btn" style="background:transparent;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;line-height:1;flex-shrink:0;">✕</button>
+    </div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1.2rem;">Pas besoin d'une photo parfaite — juste lisible. Voici où la chercher selon votre appareil :</p>
+
+    <div style="display:flex;flex-direction:column;gap:0.9rem;">
+      <div style="background:var(--bg-dark,#0d1b2a);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;">
+        <div style="font-weight:600;margin-bottom:0.3rem;">🧺 Lave-linge</div>
+        <div style="font-size:0.85rem;color:var(--gray);">Rebord intérieur de la porte, ou tout autour du hublot.</div>
+      </div>
+      <div style="background:var(--bg-dark,#0d1b2a);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;">
+        <div style="font-weight:600;margin-bottom:0.3rem;">🍽️ Lave-vaisselle</div>
+        <div style="font-size:0.85rem;color:var(--gray);">Sur un rebord de la porte (gauche, droite ou haut), porte ouverte.</div>
+      </div>
+      <div style="background:var(--bg-dark,#0d1b2a);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;">
+        <div style="font-weight:600;margin-bottom:0.3rem;">🌀 Sèche-linge</div>
+        <div style="font-size:0.85rem;color:var(--gray);">Intérieur de la porte, pourtour du hublot, ou à l'arrière de l'appareil.</div>
+      </div>
+      <div style="background:var(--bg-dark,#0d1b2a);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;">
+        <div style="font-weight:600;margin-bottom:0.3rem;">🔥 Four</div>
+        <div style="font-size:0.85rem;color:var(--gray);">Rebord de la porte ou encadrement de la niche, porte ouverte.</div>
+      </div>
+      <div style="background:var(--bg-dark,#0d1b2a);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;">
+        <div style="font-weight:600;margin-bottom:0.3rem;">🧊 Réfrigérateur / Congélateur</div>
+        <div style="font-size:0.85rem;color:var(--gray);">À l'intérieur, paroi latérale ou fond, près du bac à légumes — ou à l'arrière.</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;color:var(--gray);margin-top:1.2rem;margin-bottom:0;">Toujours introuvable ? Les infos sont aussi souvent sur la notice ou la facture d'achat — ou laissez ce champ vide, on s'en occupera sur place.</p>
   </div>
 </div>
 
