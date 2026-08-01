@@ -840,19 +840,11 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
           appareil: row.appareil, panne: row.panne
         }
       });
-      await sb.from('rdv').update({
-        email_confirmation_envoye: !confirmError,
-        email_confirmation_erreur: confirmError ? (confirmError.message || 'Erreur inconnue') : null
-      }).eq('app_id', row.app_id);
       if(confirmError) console.error('Erreur envoi email confirmation :', confirmError);
+      // Le statut d'envoi (email_confirmation_envoye / erreur) est désormais enregistré
+      // par la fonction Edge elle-même (le site public n'a pas les droits d'écriture directs sur "rdv").
     }catch(emailErr){
       console.error('Erreur envoi email confirmation :', emailErr);
-      try{
-        await sb.from('rdv').update({
-          email_confirmation_envoye: false,
-          email_confirmation_erreur: emailErr.message || 'Erreur inconnue'
-        }).eq('app_id', row.app_id);
-      }catch(updateErr){ console.error('Erreur enregistrement statut confirmation :', updateErr); }
     }
 
     document.getElementById('form-success').style.display = 'block';
