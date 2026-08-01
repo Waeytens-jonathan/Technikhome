@@ -831,7 +831,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     }
 
     try{
-      await sb.functions.invoke('send-rdv-confirmation', {
+      const { error: confirmError } = await sb.functions.invoke('send-rdv-confirmation', {
         body: {
           app_id: row.app_id,
           nom: row.nom, prenom: row.prenom, email: row.email,
@@ -840,8 +840,19 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
           appareil: row.appareil, panne: row.panne
         }
       });
+      await sb.from('rdv').update({
+        email_confirmation_envoye: !confirmError,
+        email_confirmation_erreur: confirmError ? (confirmError.message || 'Erreur inconnue') : null
+      }).eq('app_id', row.app_id);
+      if(confirmError) console.error('Erreur envoi email confirmation :', confirmError);
     }catch(emailErr){
       console.error('Erreur envoi email confirmation :', emailErr);
+      try{
+        await sb.from('rdv').update({
+          email_confirmation_envoye: false,
+          email_confirmation_erreur: emailErr.message || 'Erreur inconnue'
+        }).eq('app_id', row.app_id);
+      }catch(updateErr){ console.error('Erreur enregistrement statut confirmation :', updateErr); }
     }
 
     document.getElementById('form-success').style.display = 'block';
