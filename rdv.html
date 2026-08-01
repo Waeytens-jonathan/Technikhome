@@ -792,49 +792,14 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
       sb.from('plaque_photos_temp').delete().eq('code', plaqueCode).then(() => {}).catch(() => {});
     }
 
-    // Créer ou retrouver la fiche client automatiquement
-    try{
-      let clientId = null;
-      const tel   = (row.tel   || '').trim();
-      const email = (row.email || '').trim();
-      let existing = null;
-      if(tel){
-        const { data } = await sb.from('clients').select('app_id').eq('tel', tel).maybeSingle();
-        existing = data;
-      }
-      if(!existing && email){
-        const { data } = await sb.from('clients').select('app_id').eq('email', email).maybeSingle();
-        existing = data;
-      }
-      if(existing){
-        clientId = existing.app_id;
-      } else {
-        const newClient = {
-          app_id:  'cli_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-          nom:     row.nom     || '',
-          prenom:  row.prenom  || '',
-          tel:     tel,
-          email:   email,
-          adresse: row.adresse || '',
-          cp:      row.cp      || '',
-          ville:   row.ville   || '',
-        };
-        const { data: ins, error: insErr } = await sb.from('clients').insert(newClient).select('app_id').single();
-        if(insErr) throw insErr;
-        clientId = ins && ins.app_id;
-      }
-      if(clientId){
-        await sb.from('rdv').update({ client_id: clientId }).eq('app_id', row.app_id);
-      }
-    }catch(clientErr){
-      console.error('Erreur création client auto :', clientErr);
-    }
+    // La création/liaison de la fiche client est désormais gérée par la fonction Edge
+    // (le site public n'a pas les droits d'écriture directs sur "clients"/"rdv", RLS oblige).
 
     try{
       const { error: confirmError } = await sb.functions.invoke('send-rdv-confirmation', {
         body: {
           app_id: row.app_id,
-          nom: row.nom, prenom: row.prenom, email: row.email,
+          nom: row.nom, prenom: row.prenom, email: row.email, tel: row.tel,
           date: row.date, creneau: row.creneau,
           adresse: row.adresse, cp: row.cp, ville: row.ville,
           appareil: row.appareil, panne: row.panne
