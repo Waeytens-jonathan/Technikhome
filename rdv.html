@@ -780,6 +780,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     panne: document.getElementById('panne').value.trim(),
     note_technicien: document.getElementById('note-technicien').value.trim(),
     plaque_photo: plaquePhotoDataUrl || null,
+    distance_km: rdvDistanceKm,
     statut: 'en_attente'
   };
 
@@ -879,9 +880,31 @@ async function fetchAdresseSuggestions(q){
         document.getElementById('ville').value = el.dataset.city || '';
         adresseSuggestionsBox.style.display = 'none';
         validateCP(el.dataset.zip);
+        const lat = parseFloat(el.dataset.lat), lon = parseFloat(el.dataset.lon);
+        if(!isNaN(lat) && !isNaN(lon)) fetchDistanceDepuisLens(lat, lon);
       });
     });
   }catch(e){ adresseSuggestionsBox.style.display = 'none'; }
+}
+
+const LENS_COORDS = { lon: 2.8275, lat: 50.4322 };
+let rdvDistanceKm = null;
+
+async function fetchDistanceDepuisLens(lat, lon){
+  try{
+    const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&profile=car&optimization=shortest&start=${LENS_COORDS.lon},${LENS_COORDS.lat}&end=${lon},${lat}&geometryFormat=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const distM = data.distance || (data.routes && data.routes[0] && data.routes[0].distance);
+    if(distM){
+      rdvDistanceKm = parseFloat((distM / 1000).toFixed(1));
+      return;
+    }
+  }catch(e){}
+  // Repli à vol d'oiseau si l'API d'itinéraire ne répond pas
+  const R = 6371, dLat = (lat - LENS_COORDS.lat) * Math.PI/180, dLon = (lon - LENS_COORDS.lon) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(LENS_COORDS.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLon/2)**2;
+  rdvDistanceKm = parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1));
 }
 
 document.addEventListener('click', e => {
