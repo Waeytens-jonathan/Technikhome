@@ -781,6 +781,8 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     note_technicien: document.getElementById('note-technicien').value.trim(),
     plaque_photo: plaquePhotoDataUrl || null,
     distance_km: rdvDistanceKm,
+    lat_rdv: rdvLat,
+    lon_rdv: rdvLon,
     statut: 'en_attente'
   };
 
@@ -889,8 +891,10 @@ async function fetchAdresseSuggestions(q){
 
 const LENS_COORDS = { lon: 2.8275, lat: 50.4322 };
 let rdvDistanceKm = null;
+let rdvLat = null, rdvLon = null;
 
 async function fetchDistanceDepuisLens(lat, lon){
+  rdvLat = lat; rdvLon = lon;
   try{
     const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&profile=car&optimization=shortest&start=${LENS_COORDS.lon},${LENS_COORDS.lat}&end=${lon},${lat}&geometryFormat=geojson`;
     const res = await fetch(url);
