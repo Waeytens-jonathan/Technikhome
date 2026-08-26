@@ -769,6 +769,29 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
 
   const submitBtn = document.getElementById('submit-btn');
   submitBtn.disabled = true;
+  submitBtn.textContent = 'Vérification…';
+
+  try{
+    const checkRes = await fetch('https://gzrqkapwjwlwkvwtykfi.supabase.co/functions/v1/verifier-client-bloque', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        tel: document.getElementById('tel').value.trim(),
+        email: document.getElementById('email').value.trim()
+      })
+    });
+    const checkJson = await checkRes.json();
+    if(checkJson.bloque){
+      submitBtn.disabled = false;
+      submitBtn.textContent = '📅 Confirmer la demande de rendez-vous';
+      showToastError('Nous ne sommes pas en mesure de traiter votre demande via ce formulaire en ligne. Merci de nous contacter directement par téléphone au 07 59 70 54 97.');
+      return;
+    }
+  }catch(e){
+    console.error('Erreur vérification client :', e);
+    // En cas d'erreur technique, on laisse la demande passer plutôt que de bloquer un client légitime
+  }
+
   submitBtn.textContent = 'Envoi en cours…';
 
   const appId = 'rdv_' + Date.now();
