@@ -453,6 +453,10 @@
       <a href="/" class="form-submit" style="text-decoration:none;margin:1rem auto 0;max-width:260px;">← Retour au site</a>
     </div>
     <div id="form-error">⚠️ Une erreur est survenue. Merci de réessayer ou de nous appeler directement.</div>
+    <div id="client-bloque-message" style="display:none;text-align:center;background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.4);border-radius:12px;padding:1.5rem;margin-top:1rem;">
+      <p style="margin:0 0 1rem;font-weight:600;">⚠️ Nous ne sommes pas en mesure de traiter votre demande.</p>
+      <a href="/" class="form-submit" style="text-decoration:none;display:inline-block;max-width:260px;">← Retourner sur le site</a>
+    </div>
   </form>
 </main>
 
@@ -782,9 +786,9 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     });
     const checkJson = await checkRes.json();
     if(checkJson.bloque){
-      submitBtn.disabled = false;
-      submitBtn.textContent = '📅 Confirmer la demande de rendez-vous';
-      showToastError('Nous ne sommes pas en mesure de traiter votre demande.');
+      document.getElementById('rdv-form').style.display = 'none';
+      document.getElementById('client-bloque-message').style.display = 'block';
+      document.getElementById('client-bloque-message').scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
   }catch(e){
