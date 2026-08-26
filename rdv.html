@@ -359,6 +359,9 @@
         <textarea id="panne" placeholder="Décrivez le problème rencontré…" required></textarea>
       </div>
 
+      <div id="appareils-sup-container"></div>
+      <button type="button" id="ajouter-appareil-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px dashed var(--border);background:transparent;color:var(--gray);cursor:pointer;font-size:0.9rem;margin-bottom:1rem;">+ Ajouter un autre appareil</button>
+
       <div class="field">
         <label>Photo de la plaque signalétique <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
         <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.9rem;">Nous aide à préparer la bonne pièce avant notre passage. <button type="button" id="ouvrir-astuces-plaque-btn" style="background:none;border:none;padding:0;color:var(--orange);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;">Où la trouver ?</button></p>
@@ -560,6 +563,80 @@ const SLOT_LABELS = {
 
 let selectedDate = null;
 let selectedSlot = null;
+
+// --- Appareils supplémentaires (multi-appareils) ---
+let appareilsSup = [];
+
+function nouvelAppareilSup(){
+  return { id: 'as' + Date.now() + Math.random().toString(36).slice(2,7), appareil: '', appareilAutre: '', marque: '', modele: '', panne: '' };
+}
+
+function renderAppareilsSup(){
+  const container = document.getElementById('appareils-sup-container');
+  const appareilOptions = document.getElementById('appareil').innerHTML;
+  container.innerHTML = appareilsSup.map((row, i) => `
+    <div class="card" style="background:rgba(255,255,255,0.03);margin-bottom:1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+        <span class="section-label" style="margin:0;">Appareil ${i+2}</span>
+        <span class="as-sup-remove" data-id="${row.id}" style="cursor:pointer;color:var(--gray);font-size:0.85rem;">🗑️ Retirer</span>
+      </div>
+      <div class="field">
+        <label>Type d'appareil</label>
+        <select class="as-sup-appareil" data-id="${row.id}">${appareilOptions}</select>
+        <input type="text" class="as-sup-appareil-autre" data-id="${row.id}" placeholder="Précisez l'appareil" style="display:${row.appareil==='Autre'?'block':'none'};margin-top:0.6rem;" value="${row.appareilAutre}">
+      </div>
+      <div class="field">
+        <label>Marque <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
+        <input type="text" class="as-sup-marque" data-id="${row.id}" value="${row.marque}" placeholder="ex : Bosch, Samsung, Whirlpool…">
+      </div>
+      <div class="field">
+        <label>Modèle <span style="text-transform:none;font-weight:400;">(facultatif)</span></label>
+        <input type="text" class="as-sup-modele" data-id="${row.id}" value="${row.modele}" placeholder="ex : WAT28440FF">
+      </div>
+      <div class="field">
+        <label>Description de la panne</label>
+        <textarea class="as-sup-panne" data-id="${row.id}" placeholder="Décrivez le problème rencontré…">${row.panne}</textarea>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.as-sup-appareil').forEach(el => {
+    const row = appareilsSup.find(r => r.id === el.dataset.id);
+    el.value = row.appareil;
+    el.addEventListener('change', () => {
+      row.appareil = el.value;
+      const autreInput = container.querySelector(`.as-sup-appareil-autre[data-id="${row.id}"]`);
+      autreInput.style.display = el.value === 'Autre' ? 'block' : 'none';
+    });
+  });
+  container.querySelectorAll('.as-sup-appareil-autre').forEach(el => {
+    const row = appareilsSup.find(r => r.id === el.dataset.id);
+    el.addEventListener('input', () => { row.appareilAutre = el.value; });
+  });
+  container.querySelectorAll('.as-sup-marque').forEach(el => {
+    const row = appareilsSup.find(r => r.id === el.dataset.id);
+    el.addEventListener('input', () => { row.marque = el.value; });
+  });
+  container.querySelectorAll('.as-sup-modele').forEach(el => {
+    const row = appareilsSup.find(r => r.id === el.dataset.id);
+    el.addEventListener('input', () => { row.modele = el.value; });
+  });
+  container.querySelectorAll('.as-sup-panne').forEach(el => {
+    const row = appareilsSup.find(r => r.id === el.dataset.id);
+    el.addEventListener('input', () => { row.panne = el.value; });
+  });
+  container.querySelectorAll('.as-sup-remove').forEach(el => {
+    el.addEventListener('click', () => {
+      appareilsSup = appareilsSup.filter(r => r.id !== el.dataset.id);
+      renderAppareilsSup();
+    });
+  });
+}
+
+document.getElementById('ajouter-appareil-btn').addEventListener('click', () => {
+  appareilsSup.push(nouvelAppareilSup());
+  renderAppareilsSup();
+});
 let slotCounts = {};
 
 function toISODate(d){
@@ -821,6 +898,15 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     distance_km: rdvDistanceKm,
     lat_rdv: rdvLat,
     lon_rdv: rdvLon,
+    appareils_supplementaires: (() => {
+      const valides = appareilsSup.filter(r => r.appareil || r.panne).map(r => {
+        if(r.appareil === 'Autre' && r.appareilAutre && r.appareilAutre.trim()){
+          return { ...r, appareil: r.appareilAutre.trim() };
+        }
+        return r;
+      });
+      return valides.length ? JSON.stringify(valides) : null;
+    })(),
     statut: 'en_attente'
   };
 
