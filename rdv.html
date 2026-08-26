@@ -784,7 +784,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
     if(checkJson.bloque){
       submitBtn.disabled = false;
       submitBtn.textContent = '📅 Confirmer la demande de rendez-vous';
-      showToastError('Nous ne sommes pas en mesure de traiter votre demande via ce formulaire en ligne. Merci de nous contacter directement par téléphone au 07 59 70 54 97.');
+      showToastError('Nous ne sommes pas en mesure de traiter votre demande.');
       return;
     }
   }catch(e){
