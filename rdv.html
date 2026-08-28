@@ -713,18 +713,14 @@ function renderDateScroller(){
 async function fetchSlotCounts(dateISO){
   if(slotCounts[dateISO]) return slotCounts[dateISO];
   try{
-    const { data, error } = await sb
-      .from('rdv')
-      .select('creneau')
-      .eq('date', dateISO)
-      .neq('statut', 'annule');
-    if(error) throw error;
-    const counts = { matin: 0, apresmidi: 0 };
-    (data || []).forEach(row => {
-      if(counts[row.creneau] !== undefined) counts[row.creneau]++;
+    const res = await fetch('https://gzrqkapwjwlwkvwtykfi.supabase.co/functions/v1/compter-creneaux', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      body: JSON.stringify({ date: dateISO })
     });
-    slotCounts[dateISO] = counts;
-    return counts;
+    const counts = await res.json();
+    slotCounts[dateISO] = { matin: counts.matin || 0, apresmidi: counts.apresmidi || 0 };
+    return slotCounts[dateISO];
   }catch(e){
     console.error('Erreur chargement créneaux :', e);
     return { matin: 0, apresmidi: 0 };
