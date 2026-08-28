@@ -502,6 +502,17 @@
     <p style="font-size:0.8rem;color:var(--gray);margin-top:1.2rem;margin-bottom:0;">Toujours introuvable ? Les infos sont aussi souvent sur la notice ou la facture d'achat — ou laissez ce champ vide, on s'en occupera sur place.</p>
   </div>
 </div>
+<div id="plaque-qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:1.2rem;">
+  <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1.6rem;max-width:340px;width:100%;text-align:center;">
+    <div style="display:flex;justify-content:flex-end;">
+      <button type="button" id="plaque-qr-close-btn" style="background:transparent;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.02em;margin-bottom:0.6rem;">Scannez avec votre téléphone</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">Ouvrez l'appareil photo de votre téléphone et visez ce code — la photo apparaîtra ici automatiquement.</p>
+    <div id="plaque-qrcode" style="background:#fff;padding:0.8rem;border-radius:10px;display:inline-block;"></div>
+    <p id="plaque-qr-status" style="font-size:0.85rem;color:var(--gray);margin-top:1rem;">En attente d'une photo…</p>
+  </div>
+</div>
 <script>
 // ---------- Supabase ----------
 const SUPABASE_URL = 'https://gzrqkapwjwlwkvwtykfi.supabase.co';
@@ -1219,17 +1230,6 @@ document.getElementById('plaque-delete-btn')?.addEventListener('click', async ()
 loadAgendaConfig().then(() => renderDateScroller());
 
 </script>
-<div id="plaque-qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:1.2rem;">
-  <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1.6rem;max-width:340px;width:100%;text-align:center;">
-    <div style="display:flex;justify-content:flex-end;">
-      <button type="button" id="plaque-qr-close-btn" style="background:transparent;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
-    </div>
-    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.02em;margin-bottom:0.6rem;">Scannez avec votre téléphone</h3>
-    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">Ouvrez l'appareil photo de votre téléphone et visez ce code — la photo apparaîtra ici automatiquement.</p>
-    <div id="plaque-qrcode" style="background:#fff;padding:0.8rem;border-radius:10px;display:inline-block;"></div>
-    <p id="plaque-qr-status" style="font-size:0.85rem;color:var(--gray);margin-top:1rem;">En attente d'une photo…</p>
-  </div>
-</div>
 
 
 </body>
