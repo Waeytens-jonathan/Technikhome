@@ -1163,7 +1163,7 @@ function startPlaquePolling(){
   plaquePollInterval = setInterval(async () => {
     if(plaquePhotoDataUrl) return;
     try{
-      const { data } = await sb.from('plaque_photos_temp').select('photo_base64').eq('code', plaqueCode).single();
+      const { data } = await sb.from('plaque_photos_temp').select('photo_base64').eq('code', plaqueCode).maybeSingle();
       if(data && data.photo_base64){
         showPlaquePreview(data.photo_base64);
       }
