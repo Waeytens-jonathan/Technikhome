@@ -623,6 +623,52 @@ function attachEmailSuggestions(inputId){
   window.addEventListener('scroll', () => { if(dropdown.style.display === 'block') positionDropdown(); }, true);
 }
 
+// --- Suggestions de marques d'appareils ---
+const MARQUES_SUGGEREES = ['Bosch','Samsung','Whirlpool','LG','Siemens','Electrolux','Beko','Candy','Indesit','Miele','Brandt','De Dietrich','Thomson','Continental Edison','Haier','Hisense','Philips','Sony','Panasonic','Ariston','Hotpoint','Smeg','AEG','Bauknecht','Faure','Vedette','Sauter','Rosières','Scholtès','Zanussi','Fagor','Liebherr','Gorenje','Sharp','Toshiba','Daewoo','Dyson','Rowenta','Moulinex','Tefal','SEB','Karcher','Delonghi','Krups','Nespresso','Magimix'];
+
+function attachTextSuggestions(input, options){
+  if(!input || input._suggestAttached) return;
+  input._suggestAttached = true;
+  const dropdown = document.createElement('div');
+  dropdown.className = 'text-suggest-dropdown';
+  dropdown.style.cssText = 'position:fixed;z-index:10000;background:var(--card-bg,#141d2e);border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none;box-shadow:0 4px 16px rgba(0,0,0,0.35);';
+  document.body.appendChild(dropdown);
+
+  function positionDropdown(){
+    const rect = input.getBoundingClientRect();
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+    dropdown.style.width = Math.max(rect.width, 160) + 'px';
+  }
+
+  function renderSuggestions(){
+    const val = input.value.trim().toLowerCase();
+    if(!val){ dropdown.style.display = 'none'; return; }
+    const matches = options.filter(o => o.toLowerCase().startsWith(val) && o.toLowerCase() !== val);
+    if(!matches.length){ dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = matches.slice(0,8).map(o => `<div class="text-suggest-item" data-val="${escapeHtmlLeger(o)}" style="padding:0.5rem 0.7rem;cursor:pointer;font-size:0.88rem;color:var(--text,#fff);">${escapeHtmlLeger(o)}</div>`).join('');
+    dropdown.querySelectorAll('.text-suggest-item').forEach(item => {
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = item.dataset.val;
+        dropdown.style.display = 'none';
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+      });
+      item.addEventListener('mouseenter', () => { item.style.background = 'rgba(255,255,255,0.08)'; });
+      item.addEventListener('mouseleave', () => { item.style.background = 'transparent'; });
+    });
+    positionDropdown();
+    dropdown.style.display = 'block';
+  }
+
+  input.addEventListener('input', renderSuggestions);
+  input.addEventListener('focus', renderSuggestions);
+  input.addEventListener('blur', () => { setTimeout(() => { dropdown.style.display = 'none'; }, 150); });
+  window.addEventListener('scroll', () => { if(dropdown.style.display === 'block') positionDropdown(); }, true);
+}
+
+attachTextSuggestions(document.getElementById('marque'), MARQUES_SUGGEREES);
+
 attachEmailSuggestions('email');
 
 let selectedDate = null;
@@ -678,6 +724,7 @@ function renderAppareilsSup(){
     el.addEventListener('input', () => { row.appareilAutre = el.value; });
   });
   container.querySelectorAll('.as-sup-marque').forEach(el => {
+    attachTextSuggestions(el, MARQUES_SUGGEREES);
     const row = appareilsSup.find(r => r.id === el.dataset.id);
     el.addEventListener('input', () => { row.marque = el.value; });
   });
