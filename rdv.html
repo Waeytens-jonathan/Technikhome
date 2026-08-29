@@ -572,6 +572,59 @@ const SLOT_LABELS = {
   get apresmidi() { return `Après-midi (${agendaCfg.amDebut}–${agendaCfg.amFin})`; }
 };
 
+// --- Suggestions de domaine email (gmail.com, hotmail.com, etc.) ---
+const EMAIL_DOMAINES_SUGGERES = ['gmail.com','hotmail.com','hotmail.fr','outlook.com','outlook.fr','yahoo.fr','yahoo.com','orange.fr','free.fr','laposte.net','wanadoo.fr','sfr.fr','icloud.com','live.fr'];
+
+function escapeHtmlLeger(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function attachEmailSuggestions(inputId){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const dropdown = document.createElement('div');
+  dropdown.className = 'email-suggest-dropdown';
+  dropdown.style.cssText = 'position:fixed;z-index:10000;background:var(--card-bg,#141d2e);border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none;box-shadow:0 4px 16px rgba(0,0,0,0.35);';
+  document.body.appendChild(dropdown);
+
+  function positionDropdown(){
+    const rect = input.getBoundingClientRect();
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+    dropdown.style.width = Math.max(rect.width, 180) + 'px';
+  }
+
+  function renderSuggestions(){
+    const val = input.value;
+    const atIdx = val.indexOf('@');
+    if(atIdx === -1 || !val.slice(0, atIdx)){ dropdown.style.display = 'none'; return; }
+    const local = val.slice(0, atIdx);
+    const domainePart = val.slice(atIdx+1).toLowerCase();
+    const matches = EMAIL_DOMAINES_SUGGERES.filter(d => d.startsWith(domainePart));
+    if(!matches.length || (matches.length === 1 && matches[0] === domainePart)){ dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = matches.map(d => `<div class="email-suggest-item" data-domaine="${d}" style="padding:0.5rem 0.7rem;cursor:pointer;font-size:0.88rem;color:var(--text,#fff);">${escapeHtmlLeger(local)}@${d}</div>`).join('');
+    dropdown.querySelectorAll('.email-suggest-item').forEach(item => {
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = local + '@' + item.dataset.domaine;
+        dropdown.style.display = 'none';
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+      });
+      item.addEventListener('mouseenter', () => { item.style.background = 'rgba(255,255,255,0.08)'; });
+      item.addEventListener('mouseleave', () => { item.style.background = 'transparent'; });
+    });
+    positionDropdown();
+    dropdown.style.display = 'block';
+  }
+
+  input.addEventListener('input', renderSuggestions);
+  input.addEventListener('focus', renderSuggestions);
+  input.addEventListener('blur', () => { setTimeout(() => { dropdown.style.display = 'none'; }, 150); });
+  window.addEventListener('scroll', () => { if(dropdown.style.display === 'block') positionDropdown(); }, true);
+}
+
+attachEmailSuggestions('email');
+
 let selectedDate = null;
 let selectedSlot = null;
 
