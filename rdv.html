@@ -321,7 +321,7 @@
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input type="email" id="email" placeholder="votre@email.fr" autocomplete="email">
+          <input type="email" id="email" placeholder="votre@email.fr" required autocomplete="email">
         </div>
       </div>
       <div class="field">
@@ -915,6 +915,12 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
   }
   if(!document.getElementById('cgv-check').checked){
     showToastError('Merci de confirmer avoir pris connaissance des CGV.');
+    return;
+  }
+
+  const emailVal = (document.getElementById('email').value || '').trim();
+  if(!emailVal){
+    showToastError('L\'adresse email est obligatoire pour confirmer votre rendez-vous.');
     return;
   }
 
