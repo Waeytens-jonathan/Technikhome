@@ -681,6 +681,18 @@ function nouvelAppareilSup(){
   return { id: 'as' + Date.now() + Math.random().toString(36).slice(2,7), appareil: '', appareilAutre: '', marque: '', modele: '', panne: '' };
 }
 
+// Nombre de places occupées par cette demande : 1 par appareil renseigné
+let dernierPoidsRdv = 1;
+function poidsDemande(){
+  return 1 + appareilsSup.filter(r => r.appareil || (r.panne && r.panne.trim())).length;
+}
+function majPoidsDemande(){
+  const p = poidsDemande();
+  if(p === dernierPoidsRdv) return;
+  dernierPoidsRdv = p;
+  if(selectedDate) renderSlots();
+}
+
 function renderAppareilsSup(){
   const container = document.getElementById('appareils-sup-container');
   const appareilOptions = document.getElementById('appareil').innerHTML;
@@ -717,6 +729,7 @@ function renderAppareilsSup(){
       row.appareil = el.value;
       const autreInput = container.querySelector(`.as-sup-appareil-autre[data-id="${row.id}"]`);
       autreInput.style.display = el.value === 'Autre' ? 'block' : 'none';
+      majPoidsDemande();
     });
   });
   container.querySelectorAll('.as-sup-appareil-autre').forEach(el => {
@@ -734,12 +747,13 @@ function renderAppareilsSup(){
   });
   container.querySelectorAll('.as-sup-panne').forEach(el => {
     const row = appareilsSup.find(r => r.id === el.dataset.id);
-    el.addEventListener('input', () => { row.panne = el.value; });
+    el.addEventListener('input', () => { row.panne = el.value; majPoidsDemande(); });
   });
   container.querySelectorAll('.as-sup-remove').forEach(el => {
     el.addEventListener('click', () => {
       appareilsSup = appareilsSup.filter(r => r.id !== el.dataset.id);
       renderAppareilsSup();
+      majPoidsDemande();
     });
   });
 }
@@ -853,6 +867,8 @@ async function renderSlots(){
     c.classList.remove('full', 'selected');
     c.onclick = null;
   });
+  selectedSlot = null;
+  updateSubmitState();
 
   // Si le jour est bloqué : afficher "Fermé" sur les créneaux
   if(selectedDate && isDateBlocked(selectedDate)){
@@ -873,9 +889,15 @@ async function renderSlots(){
     const used = counts[slot] || 0;
     const max  = getSlotLimit(selectedDate, slot);
     const statusEl = card.querySelector('.slot-status');
+    const poids = poidsDemande();
     if(max === 0 || used >= max){
       card.classList.add('full');
       statusEl.textContent = 'Complet';
+      statusEl.classList.add('full-text');
+      card.onclick = null;
+    } else if(max - used < poids){
+      card.classList.add('full');
+      statusEl.textContent = `Pas assez de places pour ${poids} appareils (${max - used} dispo)`;
       statusEl.classList.add('full-text');
       card.onclick = null;
     } else {
@@ -955,7 +977,7 @@ document.getElementById('rdv-form').addEventListener('submit', async (e) => {
   const freshCounts = await fetchSlotCounts(selectedDate);
   const usedFresh = freshCounts[selectedSlot] || 0;
   const maxFresh  = getSlotLimit(selectedDate, selectedSlot);
-  if(usedFresh >= maxFresh){
+  if(usedFresh + poidsDemande() > maxFresh){
     showToastError('Ce créneau vient d\'être complet. Merci de choisir un autre créneau ou une autre date.');
     await renderSlots();
     return;
