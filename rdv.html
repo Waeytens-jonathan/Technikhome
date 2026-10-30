@@ -892,7 +892,7 @@ async function renderSlots(){
     const poids = poidsDemande();
     if(max === 0 || used >= max){
       card.classList.add('full');
-      statusEl.textContent = 'Complet';
+      statusEl.textContent = max === 0 ? 'Indisponible' : 'Complet';
       statusEl.classList.add('full-text');
       card.onclick = null;
     } else if(max - used < poids){
