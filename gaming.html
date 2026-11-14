@@ -730,6 +730,10 @@
           <input type="tel" name="tel" placeholder="06 / 07..." required>
         </div>
         <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="votre@email.fr" required autocomplete="email">
+        </div>
+        <div class="field">
           <label>Console / Matériel</label>
           <select name="appareil" required>
             <option value="" disabled selected>Choisissez…</option>
@@ -771,12 +775,20 @@ async function handleSubmit(e) {
   const form = document.getElementById('contactForm');
   const success = document.getElementById('form-success');
   const btn = form.querySelector('.form-submit');
+  // Email obligatoire (contrôle explicite en plus de l'attribut required)
+  const emailSaisi = form.email.value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailSaisi)){
+    alert('Merci de renseigner une adresse email valide pour pouvoir vous répondre.');
+    form.email.focus();
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Envoi…';
   const data = {
     access_key: "dd2ba324-6acb-4d08-892d-a405ce0bf7c8",
     subject: `Gaming - ${form.appareil.value}`,
     from_name: `${form.prenom.value} ${form.nom.value}`,
-    message: `Tél: ${form.tel.value}\nConsole: ${form.appareil.value}\n\n${form.message.value}`
+    email: emailSaisi,
+    message: `Tél: ${form.tel.value}\nEmail: ${emailSaisi}\nConsole: ${form.appareil.value}\n\n${form.message.value}`
   };
   try {
     const res = await fetch('https://api.web3forms.com/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
